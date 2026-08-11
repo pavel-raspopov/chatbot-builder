@@ -104,7 +104,7 @@ Record screenshare + voiceover: signup → upload → in-app chat → embed on s
 
 - [x] 01 Landing page
 - [x] 02 Auth
-- [ ] 03 Database + Storage schema
+- [x] 03 Database + Storage schema
 - [ ] 04 App shell
 - [ ] 05 Dashboard
 - [ ] 06 Bots list + create

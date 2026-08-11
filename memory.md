@@ -1,41 +1,39 @@
-# Memory — Landing page (01) + design imprint
+# Memory — 03 Database + Storage schema
 
-Last updated: 2026-08-11 (afternoon)
+Last updated: 2026-08-11 (evening)
 
 ## What was built
 
-- Next.js 16 App Router scaffold at repo root (Tailwind v4 `@theme`, Literata + Public Sans, no `src/`)
-- Marketing landing at `/`: `LandingNav`, `Hero` + `HeroChatMock`, `Features`, `Pricing`, `FinalCta`, `LandingFooter`
-- Shared `components/ui/Button.tsx`; plan gates in `lib/plans.ts` (Free/Pro/Business)
-- Stub auth pages: `app/(auth)/login/page.tsx`, `app/(auth)/signup/page.tsx`
-- `.env.example` (placeholders only; no Supabase/Gemini/Stripe SDKs installed)
-- Design carbonization: refreshed `DESIGN.md`, `.impeccable/design.json`, landing surface brief `.impeccable/surfaces/app-page-tsx.md`
-- `context/ui-registry.md` baseline + imprint tables; synced `ui-rules.md`, `ui-tokens.md`, `library-docs.md`, `progress-tracker.md` (01 done)
+- `supabase/` init + migrations:
+  - `supabase/migrations/20260811141039_docuchat_schema.sql` — profiles, bots, documents, chunks (`vector(768)` + HNSW), conversations, messages; RLS; `handle_new_user` trigger + backfill; `match_chunks` RPC; private Storage bucket `documents` + path policies
+  - `supabase/migrations/20260811141504_revoke_handle_new_user_execute.sql` — revoke PostgREST EXECUTE on trigger fn
+- Applied to remote project `qimzbnjsqfierkbqsepu` via MCP `apply_migration`
+- `lib/supabase/database.types.ts`; browser/server clients typed with `Database`
+- Context: progress-tracker 03 done; library-docs schema/migration notes; build-plan checklist
 
 ## Decisions made
 
-- First finished slice = landing + minimal scaffold; Auth deferred to 02
-- Scaffold via temp dir then merge — never overwrite existing `AGENTS.md` / context with create-next-app output
-- Pricing CTAs and nav auth links hit stubs until Supabase Auth lands
-- ESLint ignores `.agents/`, `.cursor/`, `skill-observations/`, `context/` so lint covers app source only
+- Plan fields on `profiles` only (no `subscriptions` table)
+- Chunks RLS via bot ownership (no `user_id` on chunks)
+- HNSW cosine index on embeddings; `match_chunks` is `SECURITY INVOKER`
+- `admin.ts` still not added
 
 ## Problems solved
 
-- Nonempty-repo `create-next-app`: scaffold in `docuchat-tmp/`, move runtime files up, discard generator docs
-- Lint noise from skill tooling fixed via `eslint.config.mjs` `globalIgnores`
+- Advisor WARN: `handle_new_user` executable by anon/authenticated — revoked EXECUTE (trigger still runs)
+- Vector opclass resolution: `set search_path to public, extensions` in migration
 
 ## Current state
 
-- `npm run build` and `npm run lint` pass
-- Landing and stubs work; no auth, DB, RAG, widget, or Stripe yet
-- Task-observer review 2026-08-11: observations #1–#2 ACTIONED; staged skill updates under `skill-updates/2026-08-11-*` (not installed into live skills yet)
+- Remote schema live; 2 profiles backfilled; RLS on all tables; `documents` bucket private
+- `npm run lint` / `npm run build` pass with typed clients
+- Auth Confirm email still a dashboard setting for local demo
+- Remaining security advisor: leaked password protection (Auth dashboard — optional)
 
 ## Next session starts with
 
-**02 Auth** — install Supabase clients (`lib/supabase/client.ts`, `server.ts`), email/password forms on `/login` + `/signup`, session middleware/proxy for protected routes, redirect to `/dashboard` (can be minimal placeholder), replace stub copy. Read `context/library-docs.md` Supabase section and Next docs under `node_modules/next/dist/docs/` (note possible `proxy` vs middleware naming on Next 16).
-
-Optional before coding: install staged skill updates from `skill-updates/2026-08-11-executing-plans` and `skill-updates/2026-08-11-imprint` into `.agents/skills/` if you want those rules live.
+**04 App shell** — authenticated layout: navbar (Dashboard, Bots, Billing) + footer per architecture / ui-registry; dashboard can stay placeholder until 05.
 
 ## Open questions
 
-- None blocking Auth. Confirm email/password only for MVP (OAuth optional later) when starting 02.
+- None blocking 04.

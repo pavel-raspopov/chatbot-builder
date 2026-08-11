@@ -51,7 +51,17 @@ MCP (when relevant) → Skills via AGENTS.md → This file (project rules) → G
 | `lib/supabase/server.ts` | RSC, Server Actions, Route Handlers — `createServerClient` with cookies |
 | `lib/supabase/proxy.ts` | `updateSession` used by root `proxy.ts` — refresh + route gates |
 | `lib/supabase/env.ts` | Shared URL / public key helpers |
+| `lib/supabase/database.types.ts` | Generated `Database` types (regenerate after schema changes) |
 | `lib/supabase/admin.ts` | Server-only service role — ingest, widget after `public_id` validation (not yet) |
+
+### Schema / migrations
+
+- SQL under `supabase/migrations/` (CLI `supabase init` + `supabase migration new`).
+- Apply to the linked remote project with Supabase MCP `apply_migration` (name in snake_case); keep repo SQL in sync.
+- `vector` lives in schema `extensions`; `chunks.embedding` is `vector(768)` with **HNSW** (`vector_cosine_ops`).
+- RPC: `match_chunks(p_bot_id, p_query_embedding, p_match_count)` — `SECURITY INVOKER` so RLS applies; service role bypasses RLS for widget later.
+- Profiles: `handle_new_user` trigger on `auth.users`; `EXECUTE` revoked from `anon`/`authenticated` (trigger-only).
+- Storage bucket `documents` is private; object path first folder = `auth.uid()`.
 
 ### Env
 
@@ -72,7 +82,7 @@ MCP (when relevant) → Skills via AGENTS.md → This file (project rules) → G
 
 - MVP: email/password only (`actions/auth.ts`). OAuth later if time allows.
 - Protect `/dashboard`, `/bots`, `/settings/*` in `lib/supabase/proxy.ts`; redirect authed users away from `/login` and `/signup`.
-- Create `profiles` row on signup in **03 Database** (trigger or server hook) — not part of Auth alone.
+- `profiles` row created on signup via `handle_new_user` trigger (backfilled for existing users).
 - For local demo: Auth → Providers → Email → disable **Confirm email** so signup returns a session immediately.
 
 ---
