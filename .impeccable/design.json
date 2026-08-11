@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-11T15:10:00+03:00",
+  "title": "Design System: DocuChat",
+  "seed": true,
+  "extensions": {
+    "colorMeta": {
+      "accent": {
+        "role": "primary",
+        "displayName": "Forest",
+        "canonical": "#1f6b4f"
+      },
+      "background": {
+        "role": "neutral",
+        "displayName": "Cool Paper",
+        "canonical": "#eef2ef"
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Desk Surface",
+        "canonical": "#f7faf8"
+      },
+      "text-primary": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#14241f"
+      },
+      "error": {
+        "role": "functional",
+        "displayName": "Alert",
+        "canonical": "#b42318"
+      },
+      "warning": {
+        "role": "functional",
+        "displayName": "Amber",
+        "canonical": "#b8750e"
+      },
+      "info": {
+        "role": "functional",
+        "displayName": "Ink Blue",
+        "canonical": "#1d4e89"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Landing hero and marketing section titles — Literata."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "App page titles — Literata."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card and section headings — Public Sans."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Paragraphs and chat message text."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Buttons, inputs, nav, meta."
+      }
+    },
+    "motion": {
+      "policy": "Subtle fades/slides for landing sections and composer focus; respect prefers-reduced-motion. No glow or bounce."
+    },
+    "shadows": {
+      "card": "0 1px 2px rgb(20 36 31 / 0.06), 0 8px 24px rgb(20 36 31 / 0.06)"
+    },
+    "notes": [
+      "Pre-implementation seed from PRODUCT.md + ui-tokens. Re-document after first UI ships.",
+      "Avoid purple-AI defaults and warm cream + terracotta cluster."
+    ]
+  }
+}

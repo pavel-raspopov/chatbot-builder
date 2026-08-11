@@ -1,0 +1,140 @@
+# Library Docs
+
+Project-specific usage patterns for every third-party library in this project. This file only covers how we use each library in **DocuChat** — rules, patterns, and constraints.
+
+Read the relevant section before implementing any feature that touches these libraries.
+
+---
+
+## Before Using Any Library
+
+1. **Check AGENTS.md** — lists installed skills and project rules.
+2. **Check if an MCP server is configured** for that library. If available and relevant, use it. **Do not use InsForge MCP** on this project.
+3. **Read this file** for project-specific patterns that override general knowledge.
+
+Order of authority:
+
+```
+MCP (when relevant) → Skills via AGENTS.md → This file (project rules) → General training knowledge
+```
+
+---
+
+## Supabase
+
+**Packages:** `@supabase/supabase-js`, `@supabase/ssr`
+
+### Clients
+
+| File | When |
+| --- | --- |
+| `lib/supabase/client.ts` | Browser / `"use client"` only — `createBrowserClient` |
+| `lib/supabase/server.ts` | RSC, Server Actions, Route Handlers — `createServerClient` with cookies |
+| `lib/supabase/admin.ts` | Server-only service role — ingest, widget after `public_id` validation |
+
+### Rules
+
+- Enable RLS on all user-owned tables; policies filter by `auth.uid()`.
+- Enable `vector` extension; embedding column dimension must match the embedding model (**768** for Gemini `gemini-embedding-001` with `output_dimensionality: 768`).
+- Expose similarity search via a SQL function / RPC such as `match_chunks(bot_id, query_embedding, match_count)`.
+- Storage bucket `documents`: path prefix `{user_id}/...`; authenticated write; private read via signed URLs or server download.
+- Middleware must refresh the Supabase session on protected routes (`@supabase/ssr` cookie pattern).
+- Widget visitors are not Supabase users — do not require their JWT for `/api/widget/chat`.
+
+### Auth
+
+- Prefer email/password for MVP clarity; OAuth optional if time allows.
+- Create `profiles` row on first login (trigger or server hook).
+
+---
+
+## Gemini (AI provider)
+
+**Package:** `@google/genai` (official Google Gen AI SDK)
+
+### Models (locked)
+
+| Use | Model | Notes |
+| --- | --- | --- |
+| Embeddings | `gemini-embedding-001` | Set `output_dimensionality: 768`; store as `vector(768)` in Postgres |
+| Chat | `gemini-2.5-flash` | In-app + widget answers; stream when the UI supports it |
+
+### Rules
+
+- `GEMINI_API_KEY` server-only — never ship to the browser.
+- Shared pipeline for in-app and widget chat (`lib/rag/*` + thin route wrappers) via `lib/gemini.ts`.
+- Cap max context chunks (e.g. top 5–8) and max output tokens for cost control.
+- Do **not** add OpenAI as a second provider in MVP. If models change, update this section and `architecture.md` together.
+
+### Client sketch
+
+```typescript
+// lib/gemini.ts — server only
+import { GoogleGenAI } from "@google/genai";
+
+export const gemini = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+```
+
+---
+
+## Stripe (test mode)
+
+**Package:** `stripe`
+
+### Flow
+
+1. `POST /api/stripe/checkout` creates a Checkout Session with `client_reference_id` / metadata = user id + target plan.
+2. `POST /api/stripe/webhook` verifies signature and updates `profiles.plan` (+ Stripe customer/subscription ids).
+3. Billing UI may also open Customer Portal for cancellation/change in test mode.
+
+### Rules
+
+- Use **test** keys only for this demo.
+- Map price IDs via env: `STRIPE_PRICE_PRO`, `STRIPE_PRICE_BUSINESS`.
+- Free plan needs no Stripe customer.
+- Feature gates live in `lib/plans.ts` and are enforced on the server.
+- Prefer real Stripe test Checkout over a fake “mock billing” screen that never hits Stripe. Mock only if credentials are unavailable — then document the mock clearly in the UI.
+
+### Plan limits (canonical)
+
+Defined also in `project-overview.md` / `PRODUCT.md`:
+
+| Plan | Bots | Messages/mo | Storage | Remove widget branding |
+| --- | --- | --- | --- | --- |
+| free | 1 | 100 | 10 MB | no |
+| pro | 5 | 2,000 | 200 MB | yes |
+| business | 20 | 10,000 | 1 GB | yes |
+
+---
+
+## PDF / text extraction
+
+- Prefer a maintained PDF text extractor suitable for Node (document choice at implement time; pin version in package.json).
+- Accept `.pdf`, `.md`, `.txt` in MVP.
+- On extract failure: set `documents.status = failed` with a user-visible error — never silent fail.
+
+---
+
+## Embed widget script
+
+- Ship `public/widget.js` (vanilla JS) or a tiny built IIFE — avoid requiring React on customer sites.
+- Config via `data-bot` (public_id) and optional `data-color` later.
+- Call `NEXT_PUBLIC_APP_URL/api/widget/chat`.
+- Show “Powered by DocuChat” unless plan allows `remove_branding`.
+
+---
+
+## Tailwind CSS
+
+- Follow installed Tailwind skills under `.agents/skills/`.
+- Use `@theme` tokens from `ui-tokens.md` (Tailwind v4 preferred when scaffolding).
+- Never use raw palette color utilities for brand/UI chrome.
+
+---
+
+## Libraries We Do Not Use
+
+- InsForge / `@insforge/sdk`
+- OpenAI / `openai` SDK (chatbot uses Gemini only)
+- Adzuna, Browserbase, Stagehand
+- PostHog (unless explicitly added later — not required by the brief)
