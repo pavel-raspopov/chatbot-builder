@@ -2,7 +2,7 @@
 version: 1
 slug: "dashboard"
 primary_target: "app/(app)/dashboard/page.tsx"
-related_targets: ["route:/dashboard", "actions/auth.ts"]
+related_targets: ["route:/dashboard", "components/layout/AppNavbar.tsx", "components/layout/AppFooter.tsx", "app/(app)/layout.tsx"]
 ---
 
 # Surface: Dashboard placeholder (`/dashboard`)
@@ -12,12 +12,12 @@ related_targets: ["route:/dashboard", "actions/auth.ts"]
 
 ## Visitor success
 
-Confirm they are authenticated (see email) and can sign out. Full dashboard metrics/bots arrive in features 04–05.
+Confirm they are authenticated (see email) and can sign out from the app navbar. Full dashboard metrics/bots arrive in feature 05.
 
 ## Composition
 
-Same gate rhythm as auth (`max-w-lg`): brand, title, short status line, secondary Sign out + Home. No app shell navbar yet (04).
+App shell from `(app)/layout.tsx` (AppNavbar + content + AppFooter). Page body is title + signed-in status only — no duplicated brand or Sign out controls.
 
 ## Visual inheritance
 
-`DESIGN.md` + Auth pages registry entry. Do not invent a second app aesthetic here.
+`DESIGN.md` + AppNavbar / AppFooter registry entries. Content uses the same title/body rhythm as auth pages inside the shell main.

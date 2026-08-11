@@ -1,7 +1,13 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-export function LandingFooter(): ReactNode {
+type LandingFooterProps = {
+  isAuthenticated?: boolean;
+};
+
+export function LandingFooter({
+  isAuthenticated = false,
+}: LandingFooterProps): ReactNode {
   return (
     <footer className="border-t border-border bg-surface">
       <div className="mx-auto flex max-w-[1120px] flex-col gap-6 px-6 py-10 sm:flex-row sm:items-center sm:justify-between">
@@ -25,10 +31,10 @@ export function LandingFooter(): ReactNode {
             Pricing
           </a>
           <Link
-            href="/login"
+            href={isAuthenticated ? "/dashboard" : "/login"}
             className="hover:text-accent focus:outline-none focus:ring-1 focus:ring-accent"
           >
-            Log in
+            {isAuthenticated ? "Dashboard" : "Log in"}
           </Link>
         </nav>
       </div>

@@ -1,7 +1,13 @@
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/Button";
 
-export function FinalCta(): ReactNode {
+type FinalCtaProps = {
+  isAuthenticated?: boolean;
+};
+
+export function FinalCta({
+  isAuthenticated = false,
+}: FinalCtaProps): ReactNode {
   return (
     <section className="border-t border-border bg-accent-muted">
       <div className="mx-auto flex max-w-[1120px] flex-col items-start gap-6 px-6 py-20 sm:flex-row sm:items-center sm:justify-between sm:py-24">
@@ -14,8 +20,12 @@ export function FinalCta(): ReactNode {
             before you embed anything.
           </p>
         </div>
-        <Button href="/signup" variant="primary" className="shrink-0">
-          Start free
+        <Button
+          href={isAuthenticated ? "/dashboard" : "/signup"}
+          variant="primary"
+          className="shrink-0"
+        >
+          {isAuthenticated ? "Go to dashboard" : "Start free"}
         </Button>
       </div>
     </section>

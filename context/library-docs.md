@@ -52,7 +52,7 @@ MCP (when relevant) → Skills via AGENTS.md → This file (project rules) → G
 | `lib/supabase/proxy.ts` | `updateSession` used by root `proxy.ts` — refresh + route gates |
 | `lib/supabase/env.ts` | Shared URL / public key helpers |
 | `lib/supabase/database.types.ts` | Generated `Database` types (regenerate after schema changes) |
-| `lib/supabase/admin.ts` | Server-only service role — ingest, widget after `public_id` validation (not yet) |
+| `lib/supabase/admin.ts` | Server-only service role — add when ingest / widget / Stripe webhook need elevated writes (deferred; not required for Phase 1) |
 
 ### Schema / migrations
 
@@ -83,6 +83,7 @@ MCP (when relevant) → Skills via AGENTS.md → This file (project rules) → G
 - MVP: email/password only (`actions/auth.ts`). OAuth later if time allows.
 - Protect `/dashboard`, `/bots`, `/settings/*` in `lib/supabase/proxy.ts`; redirect authed users away from `/login` and `/signup`.
 - `profiles` row created on signup via `handle_new_user` trigger (backfilled for existing users).
+- Profiles billing/usage columns are **not** client-updatable: `REVOKE UPDATE` from `authenticated`/`anon`; service_role writes plan/Stripe/usage. See migration `protect_profiles_billing_columns`.
 - For local demo: Auth → Providers → Email → disable **Confirm email** so signup returns a session immediately.
 
 ---

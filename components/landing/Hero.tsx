@@ -2,7 +2,11 @@ import type { ReactNode } from "react";
 import { Button } from "@/components/ui/Button";
 import { HeroChatMock } from "@/components/landing/HeroChatMock";
 
-export function Hero(): ReactNode {
+type HeroProps = {
+  isAuthenticated?: boolean;
+};
+
+export function Hero({ isAuthenticated = false }: HeroProps): ReactNode {
   return (
     <section className="relative overflow-hidden">
       <div
@@ -31,8 +35,11 @@ export function Hero(): ReactNode {
             then paste one snippet so the same answers show up for your users.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Button href="/signup" variant="primary">
-              Start free
+            <Button
+              href={isAuthenticated ? "/dashboard" : "/signup"}
+              variant="primary"
+            >
+              {isAuthenticated ? "Go to dashboard" : "Start free"}
             </Button>
             <Button href="#pricing" variant="secondary">
               See pricing

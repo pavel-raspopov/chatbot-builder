@@ -41,6 +41,7 @@ Note: Baseline established from the first real UI (`/impeccable document` scan +
 | Focus ring | `focus:outline-none focus:ring-1 focus:ring-accent` |
 | Marketing max width | `max-w-[1120px] px-6` |
 | Marketing header height | `h-16` |
+| App max width | `max-w-[1440px] px-6 sm:px-8` |
 | Landing section rhythm | `py-20 sm:py-24` |
 | Control radius | `rounded-md` |
 | Display type | `font-display` |
@@ -92,7 +93,7 @@ Last updated: 2026-08-11
 | Focus | `focus:outline-none focus:ring-1 focus:ring-accent` |
 
 **Pattern notes:**  
-Sticky marketing chrome. Primary CTA uses shared `Button`. App navbar (future) keeps the same color language; items differ (Dashboard / Bots / Billing).
+Sticky marketing chrome. Primary CTA uses shared `Button`. App navbar (`AppNavbar`) keeps the same color language; items are Dashboard / Bots / Billing.
 
 ---
 
@@ -259,14 +260,63 @@ Last updated: 2026-08-11
 
 | Property | Class |
 | --- | --- |
-| Background | page `bg-background`; no card |
-| Layout | centered `max-w-lg` (slightly wider than auth) |
-| Brand / title / body | same rhythm as Auth pages |
-| Actions | `mt-8 flex flex-wrap gap-3` secondary Buttons |
+| Background | inherits shell `bg-background`; no card |
+| Layout | content `max-w-lg` inside app main |
+| Title / body | `font-display` title + `text-text-secondary` status |
+| Actions | none (Sign out lives in AppNavbar) |
 | Shadow | none |
 
 **Pattern notes:**  
-Auth confirmation only until 04 App shell + 05 Dashboard UI. Sign-out is a Server Action form.
+Auth confirmation only until 05 Dashboard UI. Shell chrome is shared via `(app)/layout.tsx`.
+
+### AppNavbar
+
+File: `components/layout/AppNavbar.tsx`  
+Last updated: 2026-08-11
+
+| Property | Class |
+| --- | --- |
+| Background | `bg-surface/95 backdrop-blur-sm` |
+| Border | `border-b border-border` |
+| Height / layout | `h-16`, inner `max-w-[1440px] px-6 sm:px-8` |
+| Brand text | `font-display text-xl font-semibold tracking-tight text-text-primary` |
+| Nav link inactive | `text-sm font-medium text-text-secondary hover:text-accent` |
+| Nav link active | `text-sm font-medium text-accent` |
+| Focus | `focus:outline-none focus:ring-1 focus:ring-accent` |
+| Sign out | secondary `Button` in Server Action form |
+| Narrow screens | Bots + Billing `hidden sm:inline`; Dashboard + Sign out always visible |
+
+**Pattern notes:**  
+Client component for `usePathname`. Active: color only (no underline). Brand links to `/dashboard`. Billing matches `/settings/*`.
+
+### AppFooter
+
+File: `components/layout/AppFooter.tsx`  
+Last updated: 2026-08-11
+
+| Property | Class |
+| --- | --- |
+| Background | `bg-surface` |
+| Border | `border-t border-border` |
+| Layout | `max-w-[1440px] px-6 py-8 sm:px-8` |
+| Brand | `font-display text-lg font-semibold text-text-primary` |
+| Tagline | `text-sm text-text-muted` |
+
+**Pattern notes:**  
+App chrome only — no marketing anchors. Tagline: “Product docs chatbot”.
+
+### App shell layout
+
+File: `app/(app)/layout.tsx`  
+Last updated: 2026-08-11
+
+| Property | Class |
+| --- | --- |
+| Page shell | `flex min-h-dvh flex-col bg-background` |
+| Main | `mx-auto w-full max-w-[1440px] flex-1 px-6 py-8 sm:px-8` |
+
+**Pattern notes:**  
+Wraps AppNavbar → main → AppFooter. Top nav only — no sidebar.
 
 ---
 
@@ -289,7 +339,7 @@ Interactive controls: `focus:outline-none focus:ring-1 focus:ring-accent`.
 ## Layout Standard
 
 - Marketing: `max-w-[1120px] px-6`, header `h-16`, sections `py-20 sm:py-24`
-- App (future): max ~1440px, padding 24–32px, top nav only
+- App: `max-w-[1440px]`, padding `px-6 py-8 sm:px-8`, top nav only
 
 ## Motion Standard
 

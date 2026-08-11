@@ -106,7 +106,7 @@ components:
 
 **Creative North Star: "The Calm Documentation Desk"**
 
-DocuChat’s visual world is a quiet product-docs workspace: cool paper field, one forest accent, Literata for reading authority, Public Sans for UI chrome. Marketing (Persuade) and the future app (Operate) share the same atoms — landing may breathe more; the app stays denser and quieter. Light mode only for MVP.
+DocuChat’s visual world is a quiet product-docs workspace: cool paper field, one forest accent, Literata for reading authority, Public Sans for UI chrome. Marketing (Persuade) and the app (Operate) share the same atoms — landing may breathe more; the app stays denser and quieter. Light mode only for MVP.
 
 Strategy: **restrained** neutrals + one accent. Depth comes from tonal layers first, then a single soft card shadow when interaction needs lift. No purple-AI gradients, neon glow, or warm cream + terracotta defaults.
 
@@ -168,8 +168,9 @@ A cool, desaturated paper palette with a single forest primary. Semantic warning
 ## Layout
 
 - Marketing content: `max-w-[1120px]` centered, horizontal `px-6`
-- App content (future): max ~1440px, main padding 24–32px
+- App content: `max-w-[1440px]`, main `px-6 py-8 sm:px-8` (`app/(app)/layout.tsx`)
 - Marketing header: sticky `h-16`, `bg-surface/95`, bottom `border-border`
+- App header: same chrome tokens; inner `max-w-[1440px]`; links Dashboard / Bots / Billing + Sign out (`AppNavbar`)
 - Landing section rhythm: `py-20 sm:py-24` (~80–96px)
 - Top navbar only — no sidebar in MVP
 - Hero first viewport: one composition — brand, one headline, one supporting line, one CTA group, one dominant product visual (chat mock)
@@ -236,12 +237,19 @@ Shipped as `components/ui/Input.tsx` — used on `/login` and `/signup`.
 
 ### Auth / Operate gate pages
 
-Centered column (`max-w-md` auth, `max-w-lg` early dashboard): Literata brand in `text-accent`, page title Literata, body secondary. Forms stack `gap-4`; no marketing cards. Surface briefs: `.impeccable/surfaces/auth.md`, `dashboard.md`.
+Centered column (`max-w-md` auth): Literata brand in `text-accent`, page title Literata, body secondary. Forms stack `gap-4`; no marketing cards. Surface briefs: `.impeccable/surfaces/auth.md`. Dashboard content lives inside the app shell (`dashboard.md`).
 
 ### Navigation (marketing)
 
 - Sticky surface bar with subtle blur; Literata wordmark; Public Sans links `text-text-secondary` → hover/active `text-accent`
 - Primary CTA in nav is the shared Button
+
+### Navigation (app — shipped)
+
+- Same sticky surface + blur tokens as marketing; Literata wordmark → `/dashboard`
+- Links: Dashboard, Bots, Billing — active `text-accent`, inactive `text-text-secondary` (color only)
+- Sign out: secondary `Button` + Server Action form
+- Components: `components/layout/AppNavbar.tsx`, `AppFooter.tsx`
 
 ### Chat (marketing mock + future app)
 

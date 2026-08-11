@@ -126,6 +126,12 @@ export async function POST(req: NextRequest) {
 
 ## Server Actions
 
+Two shapes — pick by how the UI consumes the action:
+
+### A) CRUD / button mutations (default)
+
+Return a result object. Do not throw application errors.
+
 ```typescript
 "use server";
 
@@ -138,19 +144,52 @@ export async function createBot(input: CreateBotInput) {
     // validate + plan gates
     // write to DB
     revalidatePath("/bots");
-    return { success: true };
+    return { success: true as const };
   } catch (error) {
     console.error("[actions/bots]", error);
-    return { success: false, error: "Failed to create bot" };
+    return { success: false as const, error: "Failed to create bot" };
   }
 }
 ```
 
-- Every Server Action has a try/catch
-- Every Server Action returns `{ success: boolean, error?: string }`
-- Always call `revalidatePath` after mutations that affect page data
-- Never throw from Server Actions — always return the error
+- Every CRUD Server Action has a try/catch
+- Return `{ success: boolean, error?: string }` (optionally `data`)
+- Call `revalidatePath` / `updateTag` after mutations that affect page data
 - Enforce plan limits server-side before writes
+
+### B) Form actions with `useActionState` (auth, multi-field forms)
+
+Match Next.js forms guide + React `useActionState`: first arg is previous state; return a typed state on validation / provider failure. On success, call `redirect()` (or return a success message when no navigation is needed).
+
+```typescript
+"use server";
+
+import { redirect, unstable_rethrow } from "next/navigation";
+
+export type AuthActionState = {
+  error: string | null;
+  message: string | null;
+};
+
+export async function signIn(
+  _prev: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
+  try {
+    // validate → return { error, message: null }
+    // supabase call → return error state on failure
+    redirect("/dashboard"); // success — control-flow throw
+  } catch (error) {
+    unstable_rethrow(error); // rethrow redirect / notFound
+    console.error("[actions/auth]", error);
+    return { error: "Something went wrong.", message: null };
+  }
+}
+```
+
+- Do **not** force `{ success }` onto `useActionState` flows — the hook needs a stable UI state shape
+- Always `unstable_rethrow(error)` inside catch so `redirect()` / `notFound()` still work (Next.js docs)
+- `redirect()` after successful auth is preferred over returning success and navigating on the client
 
 ---
 

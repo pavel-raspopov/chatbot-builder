@@ -1,39 +1,38 @@
-# Memory — 03 Database + Storage schema
+# Memory — 04 App shell + Phase 1 review fixes
 
 Last updated: 2026-08-11 (evening)
 
 ## What was built
 
-- `supabase/` init + migrations:
-  - `supabase/migrations/20260811141039_docuchat_schema.sql` — profiles, bots, documents, chunks (`vector(768)` + HNSW), conversations, messages; RLS; `handle_new_user` trigger + backfill; `match_chunks` RPC; private Storage bucket `documents` + path policies
-  - `supabase/migrations/20260811141504_revoke_handle_new_user_execute.sql` — revoke PostgREST EXECUTE on trigger fn
-- Applied to remote project `qimzbnjsqfierkbqsepu` via MCP `apply_migration`
-- `lib/supabase/database.types.ts`; browser/server clients typed with `Database`
-- Context: progress-tracker 03 done; library-docs schema/migration notes; build-plan checklist
+- **04 App shell:** `components/layout/AppNavbar.tsx`, `AppFooter.tsx`; `app/(app)/layout.tsx` shell (`max-w-[1440px]`); stubs `app/(app)/bots/page.tsx`, `settings/billing/page.tsx`; dashboard content-only (sign-out in nav)
+- **Review fixes:** migration `supabase/migrations/20260811150008_protect_profiles_billing_columns.sql` (applied remote) — revoke client UPDATE on `profiles`; WITH CHECK locks plan/Stripe/usage
+- Landing CTAs respect auth (`getClaims` on `app/page.tsx` → Dashboard / Manage billing)
+- Auth actions: try/catch + `unstable_rethrow`; `signOut` logs errors then redirects
+- App nav: Bots/Billing `hidden sm:inline` on narrow screens
+- Docs: `code-standards.md` dual Server Action shapes; DESIGN/PRODUCT/ui-registry/architecture/library-docs/progress-tracker updated
 
 ## Decisions made
 
-- Plan fields on `profiles` only (no `subscriptions` table)
-- Chunks RLS via bot ownership (no `user_id` on chunks)
-- HNSW cosine index on embeddings; `match_chunks` is `SECURITY INVOKER`
-- `admin.ts` still not added
+- Server Actions: CRUD → `{ success, error? }`; auth/`useActionState` forms → typed state + `redirect()` (do not force `{ success }` onto auth)
+- Profiles billing fields: service_role only; no client UPDATE grants for authenticated/anon
+- `admin.ts` still deferred until ingest/webhook
+- Auth Confirm email remains a Supabase dashboard setting for local demo
 
 ## Problems solved
 
-- Advisor WARN: `handle_new_user` executable by anon/authenticated — revoked EXECUTE (trigger still runs)
-- Vector opclass resolution: `set search_path to public, extensions` in migration
+- Feature-review Critical: users could self-update `plan` / usage / Stripe ids via RLS — fixed with REVOKE + WITH CHECK
+- code-standards vs Next.js forms: clarified two action patterns instead of rewriting auth to `{ success }`
 
 ## Current state
 
-- Remote schema live; 2 profiles backfilled; RLS on all tables; `documents` bucket private
-- `npm run lint` / `npm run build` pass with typed clients
-- Auth Confirm email still a dashboard setting for local demo
-- Remaining security advisor: leaked password protection (Auth dashboard — optional)
+- Phase 1 complete (01–04); lint/build green
+- App chrome works on `/dashboard`, `/bots`, `/settings/billing`
+- Signed-in landing links to dashboard/billing
 
 ## Next session starts with
 
-**04 App shell** — authenticated layout: navbar (Dashboard, Bots, Billing) + footer per architecture / ui-registry; dashboard can stay placeholder until 05.
+**05 Dashboard** — bot count, usage (messages), plan badge, empty states, CTA to create bot / upgrade (real data from `profiles` + bots under RLS).
 
 ## Open questions
 
-- None blocking 04.
+- None blocking 05.

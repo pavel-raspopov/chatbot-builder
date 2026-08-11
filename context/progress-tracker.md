@@ -7,8 +7,8 @@ Update this file after every completed feature. Any AI agent reading this should
 ## Current Status
 
 **Phase:** Phase 1 — Foundation
-**Last completed:** 03 Database + Storage — tables/RLS, pgvector 768 + HNSW, `match_chunks`, profiles trigger, `documents` bucket
-**Next:** 04 App shell — authenticated layout navbar (Dashboard, Bots, Billing)
+**Last completed:** 04 App shell — authenticated navbar (Dashboard / Bots / Billing), footer, stub routes
+**Next:** 05 Dashboard — bot count, usage, plan badge, empty states
 
 ---
 
@@ -19,7 +19,7 @@ Update this file after every completed feature. Any AI agent reading this should
 - [x] 01 Landing page
 - [x] 02 Auth
 - [x] 03 Database + Storage schema
-- [ ] 04 App shell
+- [x] 04 App shell
 
 ### Phase 2 — Bots + Knowledge
 
@@ -56,3 +56,5 @@ Update this file after every completed feature. Any AI agent reading this should
 - `lib/plans.ts` holds Free/Pro/Business gates for UI (enforce server-side when Auth/billing land)
 - Auth uses `@supabase/ssr` + root `proxy.ts`; public key via `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (anon JWT fallback)
 - Schema lives in `supabase/migrations/`; applied to remote via Supabase MCP `apply_migration`. Types: `lib/supabase/database.types.ts`
+- Profiles: authenticated cannot UPDATE (billing/usage locked); service_role updates plan via webhooks later
+- Auth Confirm email: disable in Supabase Auth settings for seamless local demo (signup message documents this)

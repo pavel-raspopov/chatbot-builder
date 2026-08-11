@@ -156,7 +156,7 @@ Store Stripe subscription status, price id, current period end for portal / gati
 
 ## RLS
 
-- `profiles`: user can read/update own row
+- `profiles`: user can **select** own row. Client **UPDATE** is revoked for `authenticated`/`anon` (billing/usage columns are service_role only). Defense-in-depth UPDATE policy also locks `plan`, Stripe ids, and message counters.
 - `bots`, `documents`, `chunks`, `conversations` (app): owner `user_id = auth.uid()`
 - Widget path: **no** end-user JWT — Route Handler uses service role after validating `public_id`, rate limits, and plan quotas; never expose service role to the browser
 - Storage bucket `documents`: authenticated upload only under `{user_id}/...`

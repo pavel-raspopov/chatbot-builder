@@ -2,7 +2,13 @@ import type { ReactNode } from "react";
 import { Button } from "@/components/ui/Button";
 import { plans } from "@/lib/plans";
 
-export function Pricing(): ReactNode {
+type PricingProps = {
+  isAuthenticated?: boolean;
+};
+
+export function Pricing({
+  isAuthenticated = false,
+}: PricingProps): ReactNode {
   return (
     <section id="pricing" className="border-t border-border bg-surface-secondary/40">
       <div className="mx-auto max-w-[1120px] px-6 py-20 sm:py-24">
@@ -53,11 +59,21 @@ export function Pricing(): ReactNode {
               </ul>
               <div className="mt-8">
                 <Button
-                  href="/signup"
+                  href={
+                    isAuthenticated
+                      ? plan.id === "free"
+                        ? "/dashboard"
+                        : "/settings/billing"
+                      : "/signup"
+                  }
                   variant={plan.highlighted ? "primary" : "secondary"}
                   className="w-full"
                 >
-                  {plan.ctaLabel}
+                  {isAuthenticated
+                    ? plan.id === "free"
+                      ? "Open dashboard"
+                      : "Manage billing"
+                    : plan.ctaLabel}
                 </Button>
               </div>
             </article>

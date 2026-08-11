@@ -45,14 +45,14 @@ Use `font-display` for brand + marketing/page titles; body defaults to `font-san
 - Links: `text-sm font-medium text-text-secondary hover:text-accent`
 - Primary CTA: shared `Button` → Start free
 
-## Navbar (app — future)
+## Navbar (app — shipped)
 
-Items: Dashboard, Bots, Billing (+ user/sign out).
+Items: Dashboard, Bots, Billing (+ Sign out).
 
 - Active: `text-accent`, font-medium
 - Inactive: `text-text-secondary`
 - No underline — color change only
-
+- Components: `components/layout/AppNavbar.tsx`, `AppFooter.tsx`
 ---
 
 ## Auth / Operate gates (shipped)
