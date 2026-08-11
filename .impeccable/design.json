@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-11T16:14:11+03:00",
+  "generatedAt": "2026-08-11T16:56:00+03:00",
   "title": "Design System: DocuChat",
   "seed": false,
   "extensions": {
@@ -143,9 +143,9 @@
       "name": "Text Input",
       "kind": "input",
       "refersTo": "input",
-      "description": "Token-standard field (auth forms will use this).",
-      "html": "<input class=\"ds-input\" type=\"email\" placeholder=\"you@company.com\" aria-label=\"Email\" />",
-      "css": ".ds-input { width: 100%; border-radius: var(--radius-md, 0.5rem); border: 1px solid var(--color-border, #c5d0c9); background: var(--color-surface, #f7faf8); color: var(--color-text-primary, #14241f); padding: 8px 12px; font: 500 0.875rem/1.4 \"Public Sans\", ui-sans-serif, system-ui, sans-serif; } .ds-input::placeholder { color: var(--color-text-muted, #6d7f76); } .ds-input:focus { outline: none; box-shadow: 0 0 0 1px var(--color-accent, #1f6b4f); }"
+      "description": "Labeled field from components/ui/Input.tsx — auth forms and future Operate forms.",
+      "html": "<label class=\"ds-field\"><span>Email</span><input class=\"ds-input\" type=\"email\" name=\"email\" placeholder=\"you@company.com\" /></label>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; font: 500 0.875rem/1.4 \"Public Sans\", ui-sans-serif, system-ui, sans-serif; color: var(--color-text-primary, #14241f); } .ds-input { width: 100%; border-radius: var(--radius-md, 0.5rem); border: 1px solid var(--color-border, #c5d0c9); background: var(--color-surface, #f7faf8); color: var(--color-text-primary, #14241f); padding: 8px 12px; font: 400 1rem/1.5 \"Public Sans\", ui-sans-serif, system-ui, sans-serif; } .ds-input::placeholder { color: var(--color-text-muted, #6d7f76); } .ds-input:focus { outline: none; box-shadow: 0 0 0 1px var(--color-accent, #1f6b4f); }"
     }
   ],
   "narrative": {

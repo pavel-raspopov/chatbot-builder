@@ -1,5 +1,5 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
+import { SignupForm } from "@/components/auth/SignupForm";
 import { Button } from "@/components/ui/Button";
 
 export default function SignupPage(): ReactNode {
@@ -10,19 +10,14 @@ export default function SignupPage(): ReactNode {
         Start free
       </h1>
       <p className="mt-3 text-base leading-relaxed text-text-secondary">
-        Auth arrives next. Account creation with Supabase will replace this
-        placeholder.
+        Create an account to build bots from your docs. Free plan, no card
+        required.
       </p>
-      <div className="mt-8 flex flex-wrap gap-3">
+      <SignupForm />
+      <div className="mt-8">
         <Button href="/" variant="secondary">
           Back to home
         </Button>
-        <Link
-          href="/login"
-          className="inline-flex items-center text-sm font-medium text-accent hover:text-accent-dark focus:outline-none focus:ring-1 focus:ring-accent"
-        >
-          Log in instead
-        </Link>
       </div>
     </main>
   );

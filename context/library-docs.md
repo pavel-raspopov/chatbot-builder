@@ -41,7 +41,7 @@ MCP (when relevant) → Skills via AGENTS.md → This file (project rules) → G
 
 ## Supabase
 
-**Packages:** `@supabase/supabase-js`, `@supabase/ssr`
+**Packages:** `@supabase/supabase-js`, `@supabase/ssr` (installed)
 
 ### Clients
 
@@ -49,7 +49,15 @@ MCP (when relevant) → Skills via AGENTS.md → This file (project rules) → G
 | --- | --- |
 | `lib/supabase/client.ts` | Browser / `"use client"` only — `createBrowserClient` |
 | `lib/supabase/server.ts` | RSC, Server Actions, Route Handlers — `createServerClient` with cookies |
-| `lib/supabase/admin.ts` | Server-only service role — ingest, widget after `public_id` validation |
+| `lib/supabase/proxy.ts` | `updateSession` used by root `proxy.ts` — refresh + route gates |
+| `lib/supabase/env.ts` | Shared URL / public key helpers |
+| `lib/supabase/admin.ts` | Server-only service role — ingest, widget after `public_id` validation (not yet) |
+
+### Env
+
+- Prefer `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (`sb_publishable_…`).
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` (legacy JWT) is accepted as fallback.
+- `SUPABASE_SERVICE_ROLE_KEY` server-only — never expose to the browser.
 
 ### Rules
 
@@ -57,13 +65,15 @@ MCP (when relevant) → Skills via AGENTS.md → This file (project rules) → G
 - Enable `vector` extension; embedding column dimension must match the embedding model (**768** for Gemini `gemini-embedding-001` with `output_dimensionality: 768`).
 - Expose similarity search via a SQL function / RPC such as `match_chunks(bot_id, query_embedding, match_count)`.
 - Storage bucket `documents`: path prefix `{user_id}/...`; authenticated write; private read via signed URLs or server download.
-- Middleware must refresh the Supabase session on protected routes (`@supabase/ssr` cookie pattern).
+- Next.js 16: use root **`proxy.ts`** (not deprecated `middleware.ts`) with `@supabase/ssr` cookie `getAll` / `setAll`. Call `supabase.auth.getClaims()` to refresh/verify — do not trust `getSession()` alone in proxy.
 - Widget visitors are not Supabase users — do not require their JWT for `/api/widget/chat`.
 
 ### Auth
 
-- Prefer email/password for MVP clarity; OAuth optional if time allows.
-- Create `profiles` row on first login (trigger or server hook).
+- MVP: email/password only (`actions/auth.ts`). OAuth later if time allows.
+- Protect `/dashboard`, `/bots`, `/settings/*` in `lib/supabase/proxy.ts`; redirect authed users away from `/login` and `/signup`.
+- Create `profiles` row on signup in **03 Database** (trigger or server hook) — not part of Auth alone.
+- For local demo: Auth → Providers → Email → disable **Confirm email** so signup returns a session immediately.
 
 ---
 

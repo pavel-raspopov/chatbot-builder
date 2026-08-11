@@ -2,14 +2,14 @@
 version: 1
 slug: "app-page-tsx"
 primary_target: "app/page.tsx"
-related_targets: ["route:/","components/landing/Hero.tsx","components/landing/Pricing.tsx"]
+related_targets: ["route:/","components/landing/Hero.tsx","components/landing/Pricing.tsx","route:/login","route:/signup"]
 ---
 
 # Surface: Marketing landing (`/`)
 
 **Mode:** Persuade  
 **Primary target:** `app/page.tsx`  
-**Related:** `components/landing/*`, stub auth routes
+**Related:** `components/landing/*`, live auth routes (`/login`, `/signup`)
 
 ## Visitor success
 

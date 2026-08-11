@@ -55,6 +55,16 @@ Items: Dashboard, Bots, Billing (+ user/sign out).
 
 ---
 
+## Auth / Operate gates (shipped)
+
+- Centered column: auth `max-w-md`, early dashboard `max-w-lg`; `px-6 py-16`
+- Brand wordmark Literata `text-accent`; title Literata `text-text-primary`; body `text-text-secondary`
+- Forms: shared `Input` + `Button`; stack `gap-4`; errors `text-error` + `role="alert"`
+- No OAuth chrome in MVP; no decorative cards on gate pages
+- Surface briefs: `.impeccable/surfaces/auth.md`, `.impeccable/surfaces/dashboard.md`
+
+---
+
 ## Landing
 
 - One clear hero composition: brand, one headline, one supporting sentence, one CTA group, one dominant visual (product UI mock — not a card collage)

@@ -203,7 +203,7 @@ flowchart LR
 
 ## Auth & Middleware
 
-- `@supabase/ssr` middleware refreshes cookies on matched routes.
+- `@supabase/ssr` via root `proxy.ts` (`lib/supabase/proxy.ts` `updateSession`) refreshes cookies with `getClaims()`.
 - Protect `/dashboard`, `/bots`, `/settings/*`.
 - Landing and `/api/widget/*` remain public.
 

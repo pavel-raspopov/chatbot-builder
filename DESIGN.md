@@ -97,7 +97,7 @@ components:
     textColor: "{colors.text-primary}"
     rounded: "{rounded.md}"
     padding: "8px 12px"
-    typography: "{typography.label}"
+    typography: "{typography.body}"
 ---
 
 # Design System: DocuChat
@@ -223,9 +223,20 @@ Quiet, confident controls — forest fill for the primary action, paper + border
 - **Shadow:** `shadow-card` when interactive
 - **Padding:** `p-6`
 
-### Inputs / Fields (token standard; not fully built)
+### Inputs / Fields
 
-- Surface fill, border, control radius, `px-3 py-2`, focus ring accent (see `ui-tokens.md`)
+Shipped as `components/ui/Input.tsx` — used on `/login` and `/signup`.
+
+- **Shape:** control radius (`rounded-md`)
+- **Fill / stroke:** `bg-surface` + `border-border`
+- **Padding:** `px-3 py-2`; value text `text-base`
+- **Label:** wraps control — `text-sm font-medium text-text-primary`, stack `gap-1.5`
+- **Focus:** `focus:ring-1 focus:ring-accent`
+- **Errors:** `text-error` (inline under field or form `role="alert"`)
+
+### Auth / Operate gate pages
+
+Centered column (`max-w-md` auth, `max-w-lg` early dashboard): Literata brand in `text-accent`, page title Literata, body secondary. Forms stack `gap-4`; no marketing cards. Surface briefs: `.impeccable/surfaces/auth.md`, `dashboard.md`.
 
 ### Navigation (marketing)
 

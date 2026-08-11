@@ -204,27 +204,79 @@ Last updated: 2026-08-11
 
 ---
 
-### Auth stubs
+### Auth pages
 
 File: `app/(auth)/login/page.tsx`, `app/(auth)/signup/page.tsx`  
+Forms: `components/auth/LoginForm.tsx`, `components/auth/SignupForm.tsx`  
 Last updated: 2026-08-11
 
 | Property | Class |
 | --- | --- |
-| Layout | centered `max-w-md` column |
-| Brand | `font-display text-2xl font-semibold text-accent` |
-| Title | `font-display text-3xl font-semibold tracking-tight text-text-primary` |
-| Body | `text-base leading-relaxed text-text-secondary` |
-| Actions | secondary `Button` + text link `text-accent` |
+| Background | page `bg-background` (root); no card chrome |
+| Border | none on page shell |
+| Border radius | none on page; controls use `rounded-md` |
+| Text — brand | `font-display text-2xl font-semibold text-accent` |
+| Text — title | `font-display text-3xl font-semibold tracking-tight text-text-primary` |
+| Text — body | `text-base leading-relaxed text-text-secondary` |
+| Spacing | `px-6 py-16`; brand→title `mt-4`; title→body `mt-3`; form `mt-8 flex flex-col gap-4` |
+| Errors | `text-sm text-error` + `role="alert"` |
+| Info callout | `rounded-md border border-border bg-accent-muted px-3 py-2 text-sm text-text-secondary` |
+| Footer link | `font-medium text-accent hover:text-accent-dark focus:ring-1 focus:ring-accent` |
+| Hover / focus | accent link hover; shared Button focus ring |
+| Shadow | none |
+| Accent usage | brand wordmark + text links + primary submit |
 
 **Pattern notes:**  
-Placeholders until 02 Auth. When forms land, match Button + Input token standards.
+Operate gate screens — centered `max-w-md`, no marketing cards. Server Actions in `actions/auth.ts` + `useActionState`. No OAuth in MVP. Submit Button may be `w-full`.
+
+### Input
+
+File: `components/ui/Input.tsx`  
+Last updated: 2026-08-11
+
+| Property | Class |
+| --- | --- |
+| Background | `bg-surface` |
+| Border | `border border-border` |
+| Border radius | `rounded-md` |
+| Text — label | `text-sm font-medium text-text-primary` |
+| Text — value | `text-base font-normal text-text-primary` |
+| Text — placeholder | `placeholder:text-text-muted` |
+| Text — error | `text-sm font-normal text-error` |
+| Spacing | label column `gap-1.5`; field `px-3 py-2` |
+| Hover state | none (focus only) |
+| Focus | `focus:outline-none focus:ring-1 focus:ring-accent` |
+| Shadow | none |
+| Accent usage | focus ring only |
+
+**Pattern notes:**  
+Label wraps the control. Prefer shared `Input` over ad-hoc `<input>`. Disabled: `disabled:opacity-60`.
+
+### Dashboard placeholder
+
+File: `app/(app)/dashboard/page.tsx`  
+Last updated: 2026-08-11
+
+| Property | Class |
+| --- | --- |
+| Background | page `bg-background`; no card |
+| Layout | centered `max-w-lg` (slightly wider than auth) |
+| Brand / title / body | same rhythm as Auth pages |
+| Actions | `mt-8 flex flex-wrap gap-3` secondary Buttons |
+| Shadow | none |
+
+**Pattern notes:**  
+Auth confirmation only until 04 App shell + 05 Dashboard UI. Sign-out is a Server Action form.
 
 ---
 
 ## Button Standard
 
 Primary / secondary patterns in the Button entry. Do not invent a third button radius or padding without updating tokens + this registry.
+
+## Input Standard
+
+`components/ui/Input.tsx`: label wraps field; `bg-surface border-border rounded-md px-3 py-2`; focus `ring-1 ring-accent`; errors `text-error`. Do not invent alternate field chrome without updating this registry + DESIGN.md.
 
 ## Card Standard
 

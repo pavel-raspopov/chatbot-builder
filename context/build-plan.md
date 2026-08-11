@@ -102,8 +102,8 @@ Record screenshare + voiceover: signup → upload → in-app chat → embed on s
 
 ## Phase Checklist (mirrors progress-tracker)
 
-- [ ] 01 Landing page
-- [ ] 02 Auth
+- [x] 01 Landing page
+- [x] 02 Auth
 - [ ] 03 Database + Storage schema
 - [ ] 04 App shell
 - [ ] 05 Dashboard
