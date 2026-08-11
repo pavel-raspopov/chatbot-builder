@@ -33,9 +33,9 @@ Calm documentation desk — cool paper field, one forest accent. **Literata** fo
 @import "tailwindcss";
 
 @theme {
-  /* Fonts — wire via next/font in root layout */
-  --font-sans: "Public Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Literata", ui-serif, Georgia, serif;
+  /* Fonts — next/font sets --font-public-sans / --font-literata on <html> */
+  --font-sans: var(--font-public-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-literata), ui-serif, Georgia, serif;
 
   /* Page and surfaces */
   --color-background: #eef2ef;

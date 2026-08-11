@@ -55,7 +55,7 @@ Read in this exact order before any implementation:
 ## Available Skills
 
 - `/architect` — before any complex feature. Think before building.
-- `/imprint` — after any new UI component. Capture patterns.
+- `/imprint` — after any new UI component. Capture patterns. After the first real UI ships (or a major visual-system change), pair with `/impeccable document` so `DESIGN.md` + `.impeccable/design.json` stay aligned, then imprint the registry baseline.
 - `/feature-review` — the project's custom 3-layer review. Run before demo or when something feels off. Always prefer this over Bugbot / Security Review subagents when the user asks for a "review".
 - `/recover` — when something breaks after one failed correction.
 - `/remember save` — when a feature spans multiple sessions.

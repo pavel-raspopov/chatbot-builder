@@ -8,7 +8,7 @@ web
 
 ## Stack
 
-Next.js (App Router) + Supabase (Auth, Postgres, Storage, pgvector) + Gemini API + Stripe test mode + Tailwind CSS. Confirmed from `context/project-brief.md` and project architecture docs (greenfield; no app scaffold yet).
+Next.js 16 (App Router) + Supabase (Auth, Postgres, Storage, pgvector) + Gemini API + Stripe test mode + Tailwind CSS v4. Confirmed from `context/project-brief.md` and project architecture docs. Landing scaffold shipped; Auth/DB next.
 
 ## Users
 

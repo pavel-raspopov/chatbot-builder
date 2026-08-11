@@ -6,9 +6,9 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ## Current Status
 
-**Phase:** Phase 0 — AI + design seed complete
-**Last completed:** `/impeccable init` confirmed PRODUCT.md; basic DESIGN.md seed written
-**Next:** Scaffold Next.js + Supabase, then 01 Landing page
+**Phase:** Phase 1 — Foundation
+**Last completed:** 01 Landing page + design imprint (`DESIGN.md` scan, `ui-registry` baseline, landing surface brief)
+**Next:** 02 Auth — Supabase email/password, middleware, replace stub `/login` and `/signup`
 
 ---
 
@@ -16,7 +16,7 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ### Phase 1 — Foundation
 
-- [ ] 01 Landing page
+- [x] 01 Landing page
 - [ ] 02 Auth
 - [ ] 03 Database + Storage schema
 - [ ] 04 App shell
@@ -52,4 +52,5 @@ Update this file after every completed feature. Any AI agent reading this should
 
 - Source of truth for requirements: `context/project-brief.md`
 - Stack: Supabase + Gemini + Stripe test — never InsForge / OpenAI for chatbot
-- Run `/impeccable init` once before serious UI work to lock DESIGN.md / tokens if desired
+- App scaffolded: Next.js 16 App Router, Tailwind CSS v4 `@theme` tokens, Literata + Public Sans
+- `lib/plans.ts` holds Free/Pro/Business gates for UI (enforce server-side when Auth/billing land)

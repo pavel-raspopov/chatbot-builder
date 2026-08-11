@@ -20,6 +20,25 @@ MCP (when relevant) → Skills via AGENTS.md → This file (project rules) → G
 
 ---
 
+## Next.js
+
+**Scaffolded:** Next.js **16.3** App Router, React 19, TypeScript strict, import alias `@/*`, **no `src/` directory** (`app/` at repo root).
+
+### Rules
+
+- Read installed docs under `node_modules/next/dist/docs/` before using Next-specific APIs (this major differs from older training data).
+- App Router only; Server Components by default; `"use client"` only when needed.
+- Fonts: `next/font/google` — Public Sans → `--font-public-sans`, Literata → `--font-literata` on `<html>`; `@theme` maps `--font-sans` / `--font-display` to those variables.
+- Env placeholders live in `.env.example` (do not commit real secrets). `.gitignore` allows `!.env.example`.
+
+### Scripts
+
+- `npm run dev` — local marketing/app
+- `npm run build` — production verify
+- `npm run lint` — ESLint (`eslint-config-next`)
+
+---
+
 ## Supabase
 
 **Packages:** `@supabase/supabase-js`, `@supabase/ssr`
@@ -126,9 +145,12 @@ Defined also in `project-overview.md` / `PRODUCT.md`:
 
 ## Tailwind CSS
 
-- Follow installed Tailwind skills under `.agents/skills/`.
-- Use `@theme` tokens from `ui-tokens.md` (Tailwind v4 preferred when scaffolding).
-- Never use raw palette color utilities for brand/UI chrome.
+**Scaffolded:** Tailwind CSS **v4** via `@tailwindcss/postcss` + `app/globals.css` (`@import "tailwindcss"` + `@theme { … }` from `ui-tokens.md`).
+
+- Follow installed Tailwind skills under `.agents/skills/` when relevant.
+- Use token utilities only (`bg-accent`, `text-text-primary`, `border-border`, `shadow-card`, …).
+- Never use raw palette color utilities for brand/UI chrome (`bg-emerald-600`, `text-gray-500`).
+- Motion helpers for landing live in `globals.css` (`.animate-fade-up`, `.animate-hero-mock`) and honor `prefers-reduced-motion`.
 
 ---
 
