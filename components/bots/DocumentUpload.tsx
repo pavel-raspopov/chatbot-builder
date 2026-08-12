@@ -18,6 +18,7 @@ import {
   getDocumentAcceptAttribute,
   validateDocumentMeta,
 } from "@/lib/documents";
+import { requestDocumentIngest } from "@/lib/ingest-client";
 import { createClient } from "@/lib/supabase/client";
 
 export type DocumentUploadProps = {
@@ -35,11 +36,13 @@ export function DocumentUpload({
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const [isPending, startTransition] = useTransition();
+  const [phase, setPhase] = useState<"idle" | "uploading" | "indexing">("idle");
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   const remaining = Math.max(0, maxStorageBytes - usedBytes);
   const atQuota = remaining <= 0;
+  const busy = isPending || phase !== "idle";
 
   function processFile(file: File): void {
     setError(null);
@@ -70,6 +73,7 @@ export function DocumentUpload({
     }
 
     startTransition(async () => {
+      setPhase("uploading");
       const created = await createDocument(botId, {
         filename: file.name,
         mimeType: file.type,
@@ -77,6 +81,7 @@ export function DocumentUpload({
       });
 
       if (!created.success) {
+        setPhase("idle");
         setError(created.error);
         return;
       }
@@ -92,7 +97,18 @@ export function DocumentUpload({
       if (uploadError) {
         console.error("[DocumentUpload] storage", uploadError);
         await deleteDocument(created.documentId);
+        setPhase("idle");
         setError("Upload failed. Please try again.");
+        return;
+      }
+
+      setPhase("indexing");
+      const ingest = await requestDocumentIngest(created.documentId);
+      setPhase("idle");
+
+      if (!ingest.success) {
+        setError(ingest.error);
+        router.refresh();
         return;
       }
 
@@ -111,7 +127,7 @@ export function DocumentUpload({
   function onDrop(event: DragEvent<HTMLDivElement>): void {
     event.preventDefault();
     setIsDragging(false);
-    if (isPending || atQuota) {
+    if (busy || atQuota) {
       return;
     }
     const file = event.dataTransfer.files?.[0];
@@ -144,17 +160,18 @@ export function DocumentUpload({
         </p>
       ) : (
         <p className="mt-3 text-sm text-text-secondary">
-          PDF, Markdown, or plain text. Indexing comes next after upload.
+          PDF, Markdown, or plain text. Files are indexed automatically after
+          upload.
         </p>
       )}
 
       <div
         role="button"
-        tabIndex={atQuota || isPending ? -1 : 0}
-        aria-disabled={atQuota || isPending}
+        tabIndex={atQuota || busy ? -1 : 0}
+        aria-disabled={atQuota || busy}
         aria-describedby={error ? `${inputId}-error` : undefined}
         onKeyDown={(event) => {
-          if (atQuota || isPending) {
+          if (atQuota || busy) {
             return;
           }
           if (event.key === "Enter" || event.key === " ") {
@@ -164,7 +181,7 @@ export function DocumentUpload({
         }}
         onDragEnter={(event) => {
           event.preventDefault();
-          if (!atQuota && !isPending) {
+          if (!atQuota && !busy) {
             setIsDragging(true);
           }
         }}
@@ -177,7 +194,7 @@ export function DocumentUpload({
         }}
         onDrop={onDrop}
         onClick={() => {
-          if (!atQuota && !isPending) {
+          if (!atQuota && !busy) {
             inputRef.current?.click();
           }
         }}
@@ -185,10 +202,14 @@ export function DocumentUpload({
           isDragging
             ? "border-accent bg-accent-muted"
             : "border-border bg-surface-secondary"
-        } ${atQuota || isPending ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
+        } ${atQuota || busy ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
       >
         <p className="text-sm font-medium text-text-primary">
-          {isPending ? "Uploading…" : "Drop a file here, or choose one"}
+          {phase === "indexing"
+            ? "Indexing…"
+            : phase === "uploading" || isPending
+              ? "Uploading…"
+              : "Drop a file here, or choose one"}
         </p>
         <p className="mt-1 text-sm text-text-secondary">
           .pdf, .md, .txt · up to {formatBytes(remaining)} left on this plan
@@ -197,7 +218,7 @@ export function DocumentUpload({
           <Button
             type="button"
             variant="secondary"
-            disabled={atQuota || isPending}
+            disabled={atQuota || busy}
             onClick={(event) => {
               event.stopPropagation();
               inputRef.current?.click();
@@ -212,7 +233,7 @@ export function DocumentUpload({
           type="file"
           className="sr-only"
           accept={getDocumentAcceptAttribute()}
-          disabled={atQuota || isPending}
+          disabled={atQuota || busy}
           onChange={onInputChange}
         />
       </div>

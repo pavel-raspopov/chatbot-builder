@@ -52,7 +52,7 @@ MCP (when relevant) → Skills via AGENTS.md → This file (project rules) → G
 | `lib/supabase/proxy.ts` | `updateSession` used by root `proxy.ts` — refresh + route gates |
 | `lib/supabase/env.ts` | Shared URL / public key helpers |
 | `lib/supabase/database.types.ts` | Generated `Database` types (regenerate after schema changes) |
-| `lib/supabase/admin.ts` | Server-only service role — add when ingest / widget / Stripe webhook need elevated writes (deferred; not required for Phase 1) |
+| `lib/supabase/admin.ts` | Server-only service role — add when widget / Stripe webhook need elevated writes (ingest 08 uses user session + RLS) |
 
 ### Schema / migrations
 
@@ -115,6 +115,8 @@ import { GoogleGenAI } from "@google/genai";
 export const gemini = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 ```
 
+Use `embedTexts()` in `lib/gemini.ts` for ingest (`taskType: RETRIEVAL_DOCUMENT`, `outputDimensionality: 768`). Store vectors as `[…]` strings for PostgREST/`vector(768)`.
+
 ---
 
 ## Stripe (test mode)
@@ -149,9 +151,11 @@ Defined also in `project-overview.md` / `PRODUCT.md`:
 
 ## PDF / text extraction
 
-- Prefer a maintained PDF text extractor suitable for Node (document choice at implement time; pin version in package.json).
-- Accept `.pdf`, `.md`, `.txt` in MVP.
+- **Package:** `unpdf` (serverless PDF.js build) — extract text from PDF in Node/Next Route Handlers.
+- Before extract: polyfill `Math.sumPrecise` (`lib/rag/pdfjs-polyfill.ts`) and set PDF.js `verbosity` to errors-only so Node warning spam stays quiet.
+- Accept `.pdf`, `.md`, `.txt` in MVP (`lib/rag/extract.ts`).
 - On extract failure: set `documents.status = failed` with a user-visible error — never silent fail.
+- Ingest pipeline: `lib/rag/ingest.ts` + `POST /api/ingest` (user session / RLS; no service role yet).
 
 ---
 

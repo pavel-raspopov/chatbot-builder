@@ -1,36 +1,35 @@
-# Memory — 07 Bot detail docs upload
+# Memory — 08 Ingest / RAG indexing
 
 Last updated: 2026-08-12 (evening)
 
 ## What was built
 
-- **07 Bot detail — docs upload:** `lib/documents.ts` (MIME/extension allowlist, path helpers, `formatBytes`); `actions/documents.ts` (`createDocument` quota + pending row; `deleteDocument` Storage + row); `components/bots/DocumentUpload.tsx`, `DocumentsList.tsx`; bot detail page wired with docs + account storage usage
-- **Client env fix:** `lib/supabase/env.ts` uses static `process.env.NEXT_PUBLIC_*` reads so Turbopack inlines values for browser Storage upload
-- **Docs:** progress-tracker / build-plan (07 done, next 08), ui-registry (Document upload + Documents list), `.impeccable/surfaces/bots.md`
+- **08 Ingest / RAG indexing:** `lib/gemini.ts` (768-d `embedTexts`); `lib/rag/extract.ts`, `chunk.ts`, `ingest.ts`; `lib/rag/pdfjs-polyfill.ts`; `lib/ingest-client.ts`; `POST app/api/ingest/route.ts`
+- **UI:** `DocumentUpload` auto-POSTs ingest after Storage upload (Uploading… → Indexing…); `DocumentsList` Retry on failed/stuck processing
+- **Deps:** `@google/genai`, `unpdf`
+- **Docs:** progress-tracker / build-plan (08 done, next 09), ui-registry, library-docs, `.impeccable/surfaces/bots.md`
 
 ## Decisions made
 
-- Split flow: Server Action creates pending `documents` row after quota check; browser uploads bytes to Storage (avoids Server Action body size limits vs 50 MB bucket objects)
-- Storage path: `{user_id}/{bot_id}/{documentId}-{safeFilename}`
-- Account-wide storage quota via sum of `documents.byte_size` vs `getPlanLimits().maxStorageBytes`
-- Docs stay `status = pending` until **08** ingest; bot field edit still deferred
-- Free plan storage restored to **10 MB** after temporary 100 KB quota testing
+- Auto-start ingest after upload via sync `POST /api/ingest` under user session + RLS (no `admin.ts` yet)
+- PDF via `unpdf`; md/txt UTF-8; chunk ~600 chars / ~100 overlap; embeddings `gemini-embedding-001` @ 768-d
+- Retry re-runs ingest (deletes prior chunks first); retrieval / chat deferred to 09
 
 ## Problems solved
 
-- Drag-drop upload crashed with `Missing NEXT_PUBLIC_SUPABASE_URL` because dynamic `process.env[name]` is not inlined on the client — fixed with static property access in `env.ts`
-- Quota gate verified (temporarily 100 KB Free limit, then reverted)
+- PDF.js on Node logged `Math.sumPrecise is not a function` + font-substitution warnings during extract — polyfill + `verbosity: 0` on `getDocumentProxy`
+- Client Storage env inlining was already fixed in 07 (`lib/supabase/env.ts` static `NEXT_PUBLIC_*`)
 
 ## Current state
 
-- Phase 2; **07 complete**; upload/list/delete + Free storage quota work; lint/build previously green
-- Documents appear as Pending; no extract/chunk/embed yet
+- Phase 2; **08 complete**; upload → index → Ready verified on real PDF; lint/build green
+- Chunks written for ready docs; no in-app chat yet
 - Billing still stub
 
 ## Next session starts with
 
-**08 Ingest / RAG indexing** — extract PDF/md/txt → chunk → embed → write `chunks`; update document status (`processing` / `ready` / `failed`); show errors clearly.
+**09 In-app chat UI** — ChatGPT-like thread on `/bots/[id]/chat`; then wire retrieval + Gemini (`lib/rag/retrieve.ts` + `/api/chat`)
 
 ## Open questions
 
-- None blocking 08.
+- None blocking 09.

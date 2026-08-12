@@ -7,8 +7,8 @@ Update this file after every completed feature. Any AI agent reading this should
 ## Current Status
 
 **Phase:** Phase 2 — Bots + Knowledge
-**Last completed:** 07 Bot detail — docs upload — dropzone, list/status/delete, Storage + `documents` row, storage quota
-**Next:** 08 Ingest / RAG indexing
+**Last completed:** 08 Ingest / RAG indexing — extract → chunk → Gemini embed → `chunks`; auto after upload + Retry
+**Next:** 09 In-app chat UI
 
 ---
 
@@ -26,7 +26,7 @@ Update this file after every completed feature. Any AI agent reading this should
 - [x] 05 Dashboard
 - [x] 06 Bots list + create
 - [x] 07 Bot detail — docs upload
-- [ ] 08 Ingest / RAG indexing
+- [x] 08 Ingest / RAG indexing
 
 ### Phase 3 — Chat
 

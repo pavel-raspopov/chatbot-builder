@@ -5,6 +5,7 @@ import { useState, useTransition, type ReactNode } from "react";
 import { deleteDocument } from "@/actions/documents";
 import { Button } from "@/components/ui/Button";
 import { formatBytes, formatDocumentStatus } from "@/lib/documents";
+import { requestDocumentIngest } from "@/lib/ingest-client";
 
 export type DocumentListItem = {
   id: string;
@@ -35,17 +36,37 @@ export function DocumentsList({ documents }: DocumentsListProps): ReactNode {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [action, setAction] = useState<"delete" | "retry" | null>(null);
   const isEmpty = documents.length === 0;
 
   function handleDelete(documentId: string): void {
     setError(null);
-    setDeletingId(documentId);
+    setActiveId(documentId);
+    setAction("delete");
     startTransition(async () => {
       const result = await deleteDocument(documentId);
-      setDeletingId(null);
+      setActiveId(null);
+      setAction(null);
       if (!result.success) {
         setError(result.error);
+        return;
+      }
+      router.refresh();
+    });
+  }
+
+  function handleRetry(documentId: string): void {
+    setError(null);
+    setActiveId(documentId);
+    setAction("retry");
+    startTransition(async () => {
+      const result = await requestDocumentIngest(documentId);
+      setActiveId(null);
+      setAction(null);
+      if (!result.success) {
+        setError(result.error);
+        router.refresh();
         return;
       }
       router.refresh();
@@ -77,7 +98,12 @@ export function DocumentsList({ documents }: DocumentsListProps): ReactNode {
       <ul className="divide-y divide-border border-y border-border">
         {documents.map((doc) => {
           const uploaded = formatUploadedAt(doc.created_at);
-          const deleting = deletingId === doc.id && isPending;
+          const rowBusy = activeId === doc.id && isPending;
+          const deleting = rowBusy && action === "delete";
+          const retrying = rowBusy && action === "retry";
+          const canRetry =
+            doc.status === "failed" || doc.status === "processing";
+          const showError = doc.status === "failed" && doc.error;
 
           return (
             <li
@@ -94,18 +120,30 @@ export function DocumentsList({ documents }: DocumentsListProps): ReactNode {
                   {formatBytes(doc.byte_size)}
                   {uploaded ? ` · ${uploaded}` : ""}
                 </p>
-                {doc.status === "failed" && doc.error ? (
+                {showError ? (
                   <p className="mt-1 text-sm text-error">{doc.error}</p>
                 ) : null}
               </div>
-              <Button
-                type="button"
-                variant="secondary"
-                disabled={isPending}
-                onClick={() => handleDelete(doc.id)}
-              >
-                {deleting ? "Deleting…" : "Delete"}
-              </Button>
+              <div className="flex flex-wrap items-center gap-2">
+                {canRetry ? (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    disabled={isPending}
+                    onClick={() => handleRetry(doc.id)}
+                  >
+                    {retrying ? "Retrying…" : "Retry"}
+                  </Button>
+                ) : null}
+                <Button
+                  type="button"
+                  variant="secondary"
+                  disabled={isPending}
+                  onClick={() => handleDelete(doc.id)}
+                >
+                  {deleting ? "Deleting…" : "Delete"}
+                </Button>
+              </div>
             </li>
           );
         })}

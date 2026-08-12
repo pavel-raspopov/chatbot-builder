@@ -391,7 +391,7 @@ Last updated: 2026-08-12
 | Documents section | `mt-10`; upload + list below read-only bot fields |
 
 **Pattern notes:**  
-Own-bot RLS filter on load. Documents stay `pending` until 08 ingest.
+Own-bot RLS filter on load. Documents: `pending` → auto-ingest → `processing` / `ready` / `failed` (see 08).
 
 ### Document upload
 
@@ -412,7 +412,7 @@ Last updated: 2026-08-12
 | Errors | `text-sm text-error` + `role="alert"` |
 
 **Pattern notes:**  
-Server Action `createDocument` (quota + pending row) then browser Storage upload; on Storage failure call `deleteDocument`. Accept `.pdf,.md,.txt`. Client must use static `NEXT_PUBLIC_*` env reads (`lib/supabase/env.ts`).
+Server Action `createDocument` (quota + pending row) then browser Storage upload; on Storage failure call `deleteDocument`. After upload succeeds, client POSTs `/api/ingest` (phases: Uploading… → Indexing…). Accept `.pdf,.md,.txt`. Client must use static `NEXT_PUBLIC_*` env reads (`lib/supabase/env.ts`).
 
 ### Documents list
 
@@ -426,14 +426,14 @@ Last updated: 2026-08-12
 | Border radius | none on list |
 | Text — primary | Filename `font-medium text-text-primary`; empty title `font-display text-lg font-semibold tracking-tight text-text-primary` |
 | Text — secondary | Meta `text-sm text-text-secondary`; empty body `text-base leading-relaxed text-text-secondary` |
-| Spacing | Section `mt-8`; rows `py-4` + `gap-3` |
-| Hover / focus | Delete = secondary Button |
+| Spacing | Section `mt-8`; rows `py-4` + `gap-3`; actions `gap-2` |
+| Hover / focus | Retry / Delete = secondary Button |
 | Shadow | none |
 | Accent usage | none |
 | Errors | `text-sm text-error` + `role="alert"`; failed doc error under meta |
 
 **Pattern notes:**  
-Same divider-list pattern as Bots list. Result-object `deleteDocument` removes Storage object + row; `router.refresh()`.
+Same divider-list pattern as Bots list. Status labels via `formatDocumentStatus`. Failed / stuck Processing rows show **Retry** (`POST /api/ingest`). `deleteDocument` removes Storage object + row (chunks cascade); `router.refresh()`.
 
 ---
 
