@@ -58,7 +58,7 @@ Read in this exact order before any implementation:
 - `/imprint` — after any new UI component. Capture patterns. After the first real UI ships (or a major visual-system change), pair with `/impeccable document` so `DESIGN.md` + `.impeccable/design.json` stay aligned, then imprint the registry baseline.
 - `/feature-review` — the project's custom 3-layer review. Run before demo or when something feels off. Always prefer this over Bugbot / Security Review subagents when the user asks for a "review".
 - `/recover` — when something breaks after one failed correction.
-- `/remember save` — when a feature spans multiple sessions.
+- `/remember save` — end of session **and always before a git commit** (include `memory.md` in that commit). See `.cursor/rules/memory-before-commit.mdc`.
 - `/remember restore` — when returning after a multi-session feature.
 - `/using-superpowers` – before executing any task. Check and load relevant skills.
 - `/brainstorming` – before any new feature or UI. Explore requirements & design.
