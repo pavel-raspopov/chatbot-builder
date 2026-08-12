@@ -1,35 +1,36 @@
-# Memory — 06 Bots list + create
+# Memory — 07 Bot detail docs upload
 
 Last updated: 2026-08-12 (evening)
 
 ## What was built
 
-- **06 Bots list + create:** `actions/bots.ts` (`createBot` with plan bot limit + redirect; `deleteBot`); `components/bots/BotsList.tsx`, `CreateBotForm.tsx`; `components/ui/Textarea.tsx`
-- **Routes:** `app/(app)/bots/page.tsx` (list), `bots/new/page.tsx` (form or at-limit upgrade), `bots/[id]/page.tsx` (read-only stub for 07)
-- **Dashboard CTA:** Create bot → `/bots/new`
-- **Docs:** `.impeccable/surfaces/bots.md`, ui-registry (Textarea, Bots list, Create form, detail stub), progress-tracker / build-plan (06 done, next 07), ui-rules (`max-w-2xl` for bots)
+- **07 Bot detail — docs upload:** `lib/documents.ts` (MIME/extension allowlist, path helpers, `formatBytes`); `actions/documents.ts` (`createDocument` quota + pending row; `deleteDocument` Storage + row); `components/bots/DocumentUpload.tsx`, `DocumentsList.tsx`; bot detail page wired with docs + account storage usage
+- **Client env fix:** `lib/supabase/env.ts` uses static `process.env.NEXT_PUBLIC_*` reads so Turbopack inlines values for browser Storage upload
+- **Docs:** progress-tracker / build-plan (07 done, next 08), ui-registry (Document upload + Documents list), `.impeccable/surfaces/bots.md`
 
 ## Decisions made
 
-- Real Supabase in one session (not mock-first); same pattern as 05
-- CRUD in 06 = create + list + delete; field edit deferred to 07 bot detail
-- Create uses `useActionState` + redirect; delete uses result-object action + `revalidatePath`
-- Plan bot limits enforced in UI and Server Action via `getPlanLimits`
+- Split flow: Server Action creates pending `documents` row after quota check; browser uploads bytes to Storage (avoids Server Action body size limits vs 50 MB bucket objects)
+- Storage path: `{user_id}/{bot_id}/{documentId}-{safeFilename}`
+- Account-wide storage quota via sum of `documents.byte_size` vs `getPlanLimits().maxStorageBytes`
+- Docs stay `status = pending` until **08** ingest; bot field edit still deferred
+- Free plan storage restored to **10 MB** after temporary 100 KB quota testing
 
 ## Problems solved
 
-- None blocking; Free create → stub → second create blocked → delete verified by developer
+- Drag-drop upload crashed with `Missing NEXT_PUBLIC_SUPABASE_URL` because dynamic `process.env[name]` is not inlined on the client — fixed with static property access in `env.ts`
+- Quota gate verified (temporarily 100 KB Free limit, then reverted)
 
 ## Current state
 
-- Phase 2; **06 complete**; lint/build green
-- Bots list/create/delete work under RLS; Free limit (1 bot) gated
-- Bot detail is stub only (no upload yet); billing still stub
+- Phase 2; **07 complete**; upload/list/delete + Free storage quota work; lint/build previously green
+- Documents appear as Pending; no extract/chunk/embed yet
+- Billing still stub
 
 ## Next session starts with
 
-**07 Bot detail — docs upload** — dropzone, document list with status, delete; upload to Storage; create `documents` row; enforce storage quota.
+**08 Ingest / RAG indexing** — extract PDF/md/txt → chunk → embed → write `chunks`; update document status (`processing` / `ready` / `failed`); show errors clearly.
 
 ## Open questions
 
-- None blocking 07.
+- None blocking 08.

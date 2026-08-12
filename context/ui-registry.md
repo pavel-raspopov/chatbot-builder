@@ -376,7 +376,7 @@ Last updated: 2026-08-12
 **Pattern notes:**  
 `useActionState` + `createBot` (redirect to `/bots/[id]`). At-limit handled on the RSC page before rendering the form.
 
-### Bot detail stub
+### Bot detail
 
 File: `app/(app)/bots/[id]/page.tsx`  
 Last updated: 2026-08-12
@@ -388,9 +388,52 @@ Last updated: 2026-08-12
 | Title | `font-display text-3xl font-semibold tracking-tight text-text-primary` |
 | Body | `text-base leading-relaxed text-text-secondary` |
 | Field labels | `text-sm font-medium text-text-primary`; values `whitespace-pre-wrap` |
+| Documents section | `mt-10`; upload + list below read-only bot fields |
 
 **Pattern notes:**  
-Read-only stub until 07 docs upload. Own-bot RLS filter on load.
+Own-bot RLS filter on load. Documents stay `pending` until 08 ingest.
+
+### Document upload
+
+File: `components/bots/DocumentUpload.tsx`  
+Last updated: 2026-08-12
+
+| Property | Class |
+| --- | --- |
+| Background | Dropzone idle `bg-surface-secondary`; drag `bg-accent-muted` |
+| Border | `border border-dashed border-border`; drag `border-accent` |
+| Border radius | `rounded-md` |
+| Text — primary | Section `font-display text-xl font-semibold tracking-tight text-text-primary`; dropzone title `text-sm font-medium text-text-primary` |
+| Text — secondary | Quota / help `text-sm text-text-secondary` |
+| Spacing | Header gap `gap-2`; dropzone `px-4 py-8`; errors `mt-3` |
+| Hover / focus | Links `hover:text-accent-dark focus:ring-1 focus:ring-accent`; Choose file = secondary Button |
+| Shadow | none |
+| Accent usage | Drag state + upgrade links `text-accent` → `/settings/billing` |
+| Errors | `text-sm text-error` + `role="alert"` |
+
+**Pattern notes:**  
+Server Action `createDocument` (quota + pending row) then browser Storage upload; on Storage failure call `deleteDocument`. Accept `.pdf,.md,.txt`. Client must use static `NEXT_PUBLIC_*` env reads (`lib/supabase/env.ts`).
+
+### Documents list
+
+File: `components/bots/DocumentsList.tsx`  
+Last updated: 2026-08-12
+
+| Property | Class |
+| --- | --- |
+| Background | none (divider list, not a card) |
+| Border | List `divide-y divide-border border-y border-border` |
+| Border radius | none on list |
+| Text — primary | Filename `font-medium text-text-primary`; empty title `font-display text-lg font-semibold tracking-tight text-text-primary` |
+| Text — secondary | Meta `text-sm text-text-secondary`; empty body `text-base leading-relaxed text-text-secondary` |
+| Spacing | Section `mt-8`; rows `py-4` + `gap-3` |
+| Hover / focus | Delete = secondary Button |
+| Shadow | none |
+| Accent usage | none |
+| Errors | `text-sm text-error` + `role="alert"`; failed doc error under meta |
+
+**Pattern notes:**  
+Same divider-list pattern as Bots list. Result-object `deleteDocument` removes Storage object + row; `router.refresh()`.
 
 ---
 

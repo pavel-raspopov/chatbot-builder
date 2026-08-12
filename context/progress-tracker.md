@@ -7,8 +7,8 @@ Update this file after every completed feature. Any AI agent reading this should
 ## Current Status
 
 **Phase:** Phase 2 — Bots + Knowledge
-**Last completed:** 06 Bots list + create — list/create/delete under RLS, plan bot limits, detail stub
-**Next:** 07 Bot detail — docs upload
+**Last completed:** 07 Bot detail — docs upload — dropzone, list/status/delete, Storage + `documents` row, storage quota
+**Next:** 08 Ingest / RAG indexing
 
 ---
 
@@ -25,7 +25,7 @@ Update this file after every completed feature. Any AI agent reading this should
 
 - [x] 05 Dashboard
 - [x] 06 Bots list + create
-- [ ] 07 Bot detail — docs upload
+- [x] 07 Bot detail — docs upload
 - [ ] 08 Ingest / RAG indexing
 
 ### Phase 3 — Chat

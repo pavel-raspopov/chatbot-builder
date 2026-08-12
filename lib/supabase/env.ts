@@ -1,19 +1,22 @@
-function requiredEnv(name: string): string {
-  const value = process.env[name];
+/** Publishable key preferred; legacy anon JWT accepted as fallback. */
+export function getSupabasePublicKey(): string {
+  // Static property access so Next.js can inline NEXT_PUBLIC_* into the client bundle.
+  const value =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!value) {
-    throw new Error(`Missing ${name}`);
+    throw new Error(
+      "Missing NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY or NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    );
   }
   return value;
 }
 
-/** Publishable key preferred; legacy anon JWT accepted as fallback. */
-export function getSupabasePublicKey(): string {
-  return (
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
-    requiredEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY")
-  );
-}
-
 export function getSupabaseUrl(): string {
-  return requiredEnv("NEXT_PUBLIC_SUPABASE_URL");
+  // Static property access so Next.js can inline NEXT_PUBLIC_* into the client bundle.
+  const value = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!value) {
+    throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL");
+  }
+  return value;
 }
