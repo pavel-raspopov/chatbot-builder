@@ -1,35 +1,35 @@
-# Memory — 05 Dashboard
+# Memory — 06 Bots list + create
 
-Last updated: 2026-08-12 (afternoon)
+Last updated: 2026-08-12 (evening)
 
 ## What was built
 
-- **05 Dashboard:** `app/(app)/dashboard/page.tsx` (RSC: `profiles` + `bots` count under RLS) + `components/dashboard/DashboardOverview.tsx` (plan badge, bot/message meters, empty state, Create bot → `/bots`, Upgrade → `/settings/billing` when Free or at limit)
-- **Plan limits API:** `lib/plans.ts` — `planLimits`, `normalizePlanId`, `getPlan`, `getPlanLimits` (Free/Pro/Business aligned to marketing copy)
-- **Docs:** `.impeccable/surfaces/dashboard.md`, `context/ui-registry.md` (Dashboard overview), `progress-tracker` / `build-plan` (05 done, next 06), `ui-rules` (`max-w-2xl`), `library-docs`
-- **Commit:** `e7015bd` — Ship dashboard with live plan usage meters and empty-state CTAs
+- **06 Bots list + create:** `actions/bots.ts` (`createBot` with plan bot limit + redirect; `deleteBot`); `components/bots/BotsList.tsx`, `CreateBotForm.tsx`; `components/ui/Textarea.tsx`
+- **Routes:** `app/(app)/bots/page.tsx` (list), `bots/new/page.tsx` (form or at-limit upgrade), `bots/[id]/page.tsx` (read-only stub for 07)
+- **Dashboard CTA:** Create bot → `/bots/new`
+- **Docs:** `.impeccable/surfaces/bots.md`, ui-registry (Textarea, Bots list, Create form, detail stub), progress-tracker / build-plan (06 done, next 07), ui-rules (`max-w-2xl` for bots)
 
 ## Decisions made
 
-- UI + real Supabase reads in one session (not mock-first) — empty state is the common path until 06
-- Create bot CTA links to `/bots` stub until 06 ships list + create
-- No decorative metric cards — typography + thin meters + shared `Button`
-- Missing profile row: show error, do not invent defaults
+- Real Supabase in one session (not mock-first); same pattern as 05
+- CRUD in 06 = create + list + delete; field edit deferred to 07 bot detail
+- Create uses `useActionState` + redirect; delete uses result-object action + `revalidatePath`
+- Plan bot limits enforced in UI and Server Action via `getPlanLimits`
 
 ## Problems solved
 
-- None blocking; signed-in empty Free dashboard verified visually
+- None blocking; Free create → stub → second create blocked → delete verified by developer
 
 ## Current state
 
-- Phase 2 started; **05 complete**; lint/build green
-- Dashboard works for new Free users (0 bots / 0 messages, empty state + CTAs)
-- `/bots` and `/settings/billing` remain stubs (CTAs hand off honestly)
+- Phase 2; **06 complete**; lint/build green
+- Bots list/create/delete work under RLS; Free limit (1 bot) gated
+- Bot detail is stub only (no upload yet); billing still stub
 
 ## Next session starts with
 
-**06 Bots list + create** — list bots; create form (name, welcome message, system prompt); CRUD under RLS; enforce plan bot limits server-side via `getPlanLimits`.
+**07 Bot detail — docs upload** — dropzone, document list with status, delete; upload to Storage; create `documents` row; enforce storage quota.
 
 ## Open questions
 
-- None blocking 06.
+- None blocking 07.

@@ -103,7 +103,7 @@ export function DashboardOverview({
       ) : null}
 
       <div className="mt-8 flex flex-wrap gap-3">
-        <Button href="/bots" variant="primary">
+        <Button href="/bots/new" variant="primary">
           Create bot
         </Button>
         {showUpgrade ? (

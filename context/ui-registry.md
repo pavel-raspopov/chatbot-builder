@@ -268,12 +268,12 @@ Last updated: 2026-08-12
 | Meter track | `h-1.5 rounded-sm bg-surface-secondary` |
 | Meter fill | `bg-accent` (at limit: `bg-warning` + `text-warning` on count) |
 | Empty title | `font-display text-xl font-semibold tracking-tight text-text-primary` |
-| Actions | primary `Button` Create bot → `/bots`; secondary Upgrade → `/settings/billing` when Free or at limit |
+| Actions | primary `Button` Create bot → `/bots/new`; secondary Upgrade → `/settings/billing` when Free or at limit |
 | Errors | `text-error` + `role="alert"` on page loader |
 | Shadow | none |
 
 **Pattern notes:**  
-Server page fetches `profiles` + `bots` count under RLS; presentational overview only. No metric cards — typography + thin meters. Create bot stays on `/bots` stub until 06.
+Server page fetches `profiles` + `bots` count under RLS; presentational overview only. No metric cards — typography + thin meters. Create bot goes to `/bots/new`.
 
 ### AppNavbar
 
@@ -324,6 +324,74 @@ Last updated: 2026-08-11
 **Pattern notes:**  
 Wraps AppNavbar → main → AppFooter. Top nav only — no sidebar.
 
+### Textarea
+
+File: `components/ui/Textarea.tsx`  
+Last updated: 2026-08-12
+
+| Property | Class |
+| --- | --- |
+| Label | wraps control; `flex flex-col gap-1.5 text-sm font-medium text-text-primary` |
+| Field | `rounded-md border border-border bg-surface px-3 py-2 text-base font-normal text-text-primary` |
+| Placeholder | `placeholder:text-text-muted` |
+| Focus | `focus:outline-none focus:ring-1 focus:ring-accent` |
+| Disabled | `disabled:opacity-60` |
+| Error | `text-sm font-normal text-error` |
+| Default rows | `4` (override per form) |
+
+**Pattern notes:**  
+Same chrome as `Input`. Prefer shared `Textarea` for multi-line fields (welcome message, system prompt).
+
+### Bots list
+
+File: `components/bots/BotsList.tsx` (loaded by `app/(app)/bots/page.tsx`)  
+Last updated: 2026-08-12
+
+| Property | Class |
+| --- | --- |
+| Layout | `max-w-2xl` |
+| Title | `font-display text-3xl font-semibold tracking-tight text-text-primary` |
+| Meta | `text-base leading-relaxed text-text-secondary` (`n / max` bots) |
+| List | `divide-y divide-border border-y border-border`; rows `py-4` |
+| Bot name link | `font-medium text-text-primary hover:text-accent focus:ring-1 focus:ring-accent` |
+| Empty title | `font-display text-xl font-semibold tracking-tight text-text-primary` |
+| Actions | Create → `/bots/new`; at limit Upgrade → `/settings/billing`; Delete secondary `Button` |
+| Errors | `text-sm text-error` + `role="alert"` |
+
+**Pattern notes:**  
+No cards. Typography list + thin dividers. Client for delete via Server Action + `router.refresh()`. Plan limit gated in UI and `actions/bots.ts`.
+
+### Create bot form
+
+File: `components/bots/CreateBotForm.tsx` (page `app/(app)/bots/new/page.tsx`)  
+Last updated: 2026-08-12
+
+| Property | Class |
+| --- | --- |
+| Form | `mt-8 flex flex-col gap-4` (same as auth) |
+| Fields | `Input` name; `Textarea` welcome + system prompt |
+| Errors | `text-sm text-error` + `role="alert"` |
+| Actions | primary submit + secondary Cancel → `/bots` |
+
+**Pattern notes:**  
+`useActionState` + `createBot` (redirect to `/bots/[id]`). At-limit handled on the RSC page before rendering the form.
+
+### Bot detail stub
+
+File: `app/(app)/bots/[id]/page.tsx`  
+Last updated: 2026-08-12
+
+| Property | Class |
+| --- | --- |
+| Layout | `max-w-2xl` |
+| Breadcrumb | `text-sm`; link `text-accent` |
+| Title | `font-display text-3xl font-semibold tracking-tight text-text-primary` |
+| Body | `text-base leading-relaxed text-text-secondary` |
+| Field labels | `text-sm font-medium text-text-primary`; values `whitespace-pre-wrap` |
+
+**Pattern notes:**  
+Read-only stub until 07 docs upload. Own-bot RLS filter on load.
+
 ---
 
 ## Button Standard
@@ -332,7 +400,7 @@ Primary / secondary patterns in the Button entry. Do not invent a third button r
 
 ## Input Standard
 
-`components/ui/Input.tsx`: label wraps field; `bg-surface border-border rounded-md px-3 py-2`; focus `ring-1 ring-accent`; errors `text-error`. Do not invent alternate field chrome without updating this registry + DESIGN.md.
+`components/ui/Input.tsx`: label wraps field; `bg-surface border-border rounded-md px-3 py-2`; focus `ring-1 ring-accent`; errors `text-error`. Multi-line: `Textarea` with the same chrome. Do not invent alternate field chrome without updating this registry + DESIGN.md.
 
 ## Card Standard
 
