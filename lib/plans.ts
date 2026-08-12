@@ -10,6 +10,33 @@ export type Plan = {
   ctaLabel: string;
 };
 
+export type PlanLimits = {
+  maxBots: number;
+  maxMessagesPerMonth: number;
+  maxStorageBytes: number;
+};
+
+const MB = 1024 * 1024;
+const GB = 1024 * MB;
+
+export const planLimits: Record<PlanId, PlanLimits> = {
+  free: {
+    maxBots: 1,
+    maxMessagesPerMonth: 100,
+    maxStorageBytes: 10 * MB,
+  },
+  pro: {
+    maxBots: 5,
+    maxMessagesPerMonth: 2_000,
+    maxStorageBytes: 200 * MB,
+  },
+  business: {
+    maxBots: 20,
+    maxMessagesPerMonth: 10_000,
+    maxStorageBytes: 1 * GB,
+  },
+};
+
 export const plans: Plan[] = [
   {
     id: "free",
@@ -55,3 +82,25 @@ export const plans: Plan[] = [
     ctaLabel: "Start with Business",
   },
 ];
+
+function isPlanId(value: string): value is PlanId {
+  return value === "free" || value === "pro" || value === "business";
+}
+
+/** Resolve a plan id string; unknown values fall back to free. */
+export function normalizePlanId(value: string | null | undefined): PlanId {
+  if (value && isPlanId(value)) {
+    return value;
+  }
+  return "free";
+}
+
+export function getPlan(id: string | null | undefined): Plan {
+  const planId = normalizePlanId(id);
+  const plan = plans.find((entry) => entry.id === planId);
+  return plan ?? plans[0];
+}
+
+export function getPlanLimits(id: string | null | undefined): PlanLimits {
+  return planLimits[normalizePlanId(id)];
+}

@@ -57,12 +57,11 @@ Items: Dashboard, Bots, Billing (+ Sign out).
 
 ## Auth / Operate gates (shipped)
 
-- Centered column: auth `max-w-md`, early dashboard `max-w-lg`; `px-6 py-16`
+- Centered column: auth `max-w-md` (`px-6 py-16`); dashboard overview `max-w-2xl` inside app main
 - Brand wordmark Literata `text-accent`; title Literata `text-text-primary`; body `text-text-secondary`
 - Forms: shared `Input` + `Button`; stack `gap-4`; errors `text-error` + `role="alert"`
-- No OAuth chrome in MVP; no decorative cards on gate pages
+- No OAuth chrome in MVP; no decorative cards on gate pages or dashboard meters
 - Surface briefs: `.impeccable/surfaces/auth.md`, `.impeccable/surfaces/dashboard.md`
-
 ---
 
 ## Landing

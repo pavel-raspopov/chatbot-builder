@@ -253,21 +253,27 @@ Last updated: 2026-08-11
 **Pattern notes:**  
 Label wraps the control. Prefer shared `Input` over ad-hoc `<input>`. Disabled: `disabled:opacity-60`.
 
-### Dashboard placeholder
+### Dashboard overview
 
-File: `app/(app)/dashboard/page.tsx`  
-Last updated: 2026-08-11
+File: `components/dashboard/DashboardOverview.tsx` (loaded by `app/(app)/dashboard/page.tsx`)  
+Last updated: 2026-08-12
 
 | Property | Class |
 | --- | --- |
-| Background | inherits shell `bg-background`; no card |
-| Layout | content `max-w-lg` inside app main |
-| Title / body | `font-display` title + `text-text-secondary` status |
-| Actions | none (Sign out lives in AppNavbar) |
+| Background | inherits shell `bg-background`; no decorative cards |
+| Layout | content `max-w-2xl` inside app main |
+| Title | `font-display text-3xl font-semibold tracking-tight text-text-primary` |
+| Plan badge | `rounded-md bg-accent-muted px-2.5 py-1 text-xs font-medium text-accent` |
+| Body | `text-base leading-relaxed text-text-secondary` |
+| Meter track | `h-1.5 rounded-sm bg-surface-secondary` |
+| Meter fill | `bg-accent` (at limit: `bg-warning` + `text-warning` on count) |
+| Empty title | `font-display text-xl font-semibold tracking-tight text-text-primary` |
+| Actions | primary `Button` Create bot → `/bots`; secondary Upgrade → `/settings/billing` when Free or at limit |
+| Errors | `text-error` + `role="alert"` on page loader |
 | Shadow | none |
 
 **Pattern notes:**  
-Auth confirmation only until 05 Dashboard UI. Shell chrome is shared via `(app)/layout.tsx`.
+Server page fetches `profiles` + `bots` count under RLS; presentational overview only. No metric cards — typography + thin meters. Create bot stays on `/bots` stub until 06.
 
 ### AppNavbar
 

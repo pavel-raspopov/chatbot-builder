@@ -106,7 +106,7 @@ Record screenshare + voiceover: signup → upload → in-app chat → embed on s
 - [x] 02 Auth
 - [x] 03 Database + Storage schema
 - [x] 04 App shell
-- [ ] 05 Dashboard
+- [x] 05 Dashboard
 - [ ] 06 Bots list + create
 - [ ] 07 Bot detail — docs upload
 - [ ] 08 Ingest / RAG indexing

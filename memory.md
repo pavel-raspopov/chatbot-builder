@@ -1,38 +1,35 @@
-# Memory — 04 App shell + Phase 1 review fixes
+# Memory — 05 Dashboard
 
-Last updated: 2026-08-11 (evening)
+Last updated: 2026-08-12 (afternoon)
 
 ## What was built
 
-- **04 App shell:** `components/layout/AppNavbar.tsx`, `AppFooter.tsx`; `app/(app)/layout.tsx` shell (`max-w-[1440px]`); stubs `app/(app)/bots/page.tsx`, `settings/billing/page.tsx`; dashboard content-only (sign-out in nav)
-- **Review fixes:** migration `supabase/migrations/20260811150008_protect_profiles_billing_columns.sql` (applied remote) — revoke client UPDATE on `profiles`; WITH CHECK locks plan/Stripe/usage
-- Landing CTAs respect auth (`getClaims` on `app/page.tsx` → Dashboard / Manage billing)
-- Auth actions: try/catch + `unstable_rethrow`; `signOut` logs errors then redirects
-- App nav: Bots/Billing `hidden sm:inline` on narrow screens
-- Docs: `code-standards.md` dual Server Action shapes; DESIGN/PRODUCT/ui-registry/architecture/library-docs/progress-tracker updated
+- **05 Dashboard:** `app/(app)/dashboard/page.tsx` (RSC: `profiles` + `bots` count under RLS) + `components/dashboard/DashboardOverview.tsx` (plan badge, bot/message meters, empty state, Create bot → `/bots`, Upgrade → `/settings/billing` when Free or at limit)
+- **Plan limits API:** `lib/plans.ts` — `planLimits`, `normalizePlanId`, `getPlan`, `getPlanLimits` (Free/Pro/Business aligned to marketing copy)
+- **Docs:** `.impeccable/surfaces/dashboard.md`, `context/ui-registry.md` (Dashboard overview), `progress-tracker` / `build-plan` (05 done, next 06), `ui-rules` (`max-w-2xl`), `library-docs`
+- **Commit:** `e7015bd` — Ship dashboard with live plan usage meters and empty-state CTAs
 
 ## Decisions made
 
-- Server Actions: CRUD → `{ success, error? }`; auth/`useActionState` forms → typed state + `redirect()` (do not force `{ success }` onto auth)
-- Profiles billing fields: service_role only; no client UPDATE grants for authenticated/anon
-- `admin.ts` still deferred until ingest/webhook
-- Auth Confirm email remains a Supabase dashboard setting for local demo
+- UI + real Supabase reads in one session (not mock-first) — empty state is the common path until 06
+- Create bot CTA links to `/bots` stub until 06 ships list + create
+- No decorative metric cards — typography + thin meters + shared `Button`
+- Missing profile row: show error, do not invent defaults
 
 ## Problems solved
 
-- Feature-review Critical: users could self-update `plan` / usage / Stripe ids via RLS — fixed with REVOKE + WITH CHECK
-- code-standards vs Next.js forms: clarified two action patterns instead of rewriting auth to `{ success }`
+- None blocking; signed-in empty Free dashboard verified visually
 
 ## Current state
 
-- Phase 1 complete (01–04); lint/build green
-- App chrome works on `/dashboard`, `/bots`, `/settings/billing`
-- Signed-in landing links to dashboard/billing
+- Phase 2 started; **05 complete**; lint/build green
+- Dashboard works for new Free users (0 bots / 0 messages, empty state + CTAs)
+- `/bots` and `/settings/billing` remain stubs (CTAs hand off honestly)
 
 ## Next session starts with
 
-**05 Dashboard** — bot count, usage (messages), plan badge, empty states, CTA to create bot / upgrade (real data from `profiles` + bots under RLS).
+**06 Bots list + create** — list bots; create form (name, welcome message, system prompt); CRUD under RLS; enforce plan bot limits server-side via `getPlanLimits`.
 
 ## Open questions
 
-- None blocking 05.
+- None blocking 06.

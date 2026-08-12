@@ -6,9 +6,9 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ## Current Status
 
-**Phase:** Phase 1 — Foundation
-**Last completed:** 04 App shell — authenticated navbar (Dashboard / Bots / Billing), footer, stub routes
-**Next:** 05 Dashboard — bot count, usage, plan badge, empty states
+**Phase:** Phase 2 — Bots + Knowledge
+**Last completed:** 05 Dashboard — plan badge, bot/message usage meters, empty state, CTAs (real RLS data)
+**Next:** 06 Bots list + create
 
 ---
 
@@ -23,7 +23,7 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ### Phase 2 — Bots + Knowledge
 
-- [ ] 05 Dashboard
+- [x] 05 Dashboard
 - [ ] 06 Bots list + create
 - [ ] 07 Bot detail — docs upload
 - [ ] 08 Ingest / RAG indexing
@@ -53,7 +53,7 @@ Update this file after every completed feature. Any AI agent reading this should
 - Source of truth for requirements: `context/project-brief.md`
 - Stack: Supabase + Gemini + Stripe test — never InsForge / OpenAI for chatbot
 - App scaffolded: Next.js 16 App Router, Tailwind CSS v4 `@theme` tokens, Literata + Public Sans
-- `lib/plans.ts` holds Free/Pro/Business gates for UI (enforce server-side when Auth/billing land)
+- `lib/plans.ts` holds Free/Pro/Business marketing copy + `planLimits` / `getPlan` / `getPlanLimits` (enforce write gates server-side in 06+)
 - Auth uses `@supabase/ssr` + root `proxy.ts`; public key via `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (anon JWT fallback)
 - Schema lives in `supabase/migrations/`; applied to remote via Supabase MCP `apply_migration`. Types: `lib/supabase/database.types.ts`
 - Profiles: authenticated cannot UPDATE (billing/usage locked); service_role updates plan via webhooks later

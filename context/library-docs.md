@@ -132,7 +132,7 @@ export const gemini = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 - Use **test** keys only for this demo.
 - Map price IDs via env: `STRIPE_PRICE_PRO`, `STRIPE_PRICE_BUSINESS`.
 - Free plan needs no Stripe customer.
-- Feature gates live in `lib/plans.ts` and are enforced on the server.
+- Feature gates live in `lib/plans.ts` (`planLimits`, `getPlan`, `getPlanLimits`) and are enforced on the server for writes.
 - Prefer real Stripe test Checkout over a fake “mock billing” screen that never hits Stripe. Mock only if credentials are unavailable — then document the mock clearly in the UI.
 
 ### Plan limits (canonical)
