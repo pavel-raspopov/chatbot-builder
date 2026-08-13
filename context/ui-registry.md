@@ -391,9 +391,69 @@ Last updated: 2026-08-13
 | Primary CTA | `Open chat` → `/bots/[id]/chat` |
 | Field labels | `text-sm font-medium text-text-primary`; values `whitespace-pre-wrap` |
 | Documents section | `mt-10`; upload + list below `EditBotForm` |
+| Embed section | `EmbedSnippet` after documents |
 
 **Pattern notes:**  
-Own-bot RLS filter on load. Settings are editable (`EditBotForm`). Documents: upload auto-ingests; Retry on pending / processing / failed. Primary path into chat is **Open chat**.
+Own-bot RLS filter on load. Settings are editable (`EditBotForm`). Documents: upload auto-ingests; Retry on pending / processing / failed. Primary path into chat is **Open chat**. Embed snippet uses `public_id`, not the bot UUID.
+
+### Embed snippet
+
+File: `components/bots/EmbedSnippet.tsx` (on `app/(app)/bots/[id]/page.tsx`)  
+Last updated: 2026-08-13
+
+| Property | Class |
+| --- | --- |
+| Background | Snippet `bg-surface-secondary` |
+| Border | `border border-border` |
+| Border radius | `rounded-md` |
+| Text — primary | Section `font-display text-xl font-semibold tracking-tight text-text-primary`; code `text-sm text-text-primary` |
+| Text — secondary | Help `text-sm leading-relaxed text-text-secondary` |
+| Spacing | Section `mt-10`; snippet `mt-4 px-3 py-2.5`; actions `mt-4 gap-2` |
+| Hover / focus | Copy / Preview = secondary Button |
+| Shadow | none |
+| Accent usage | none |
+| Status | Copied `text-sm text-text-secondary` + `role="status"` |
+
+**Pattern notes:**  
+Operate section, not a card. Copy uses `navigator.clipboard`. Preview opens `/w/{public_id}` in a new tab. Do not invent a third button variant.
+
+### Widget panel
+
+File: `components/widget/WidgetPanel.tsx` (page `app/w/[publicId]/embed/page.tsx`)  
+Last updated: 2026-08-13
+
+| Property | Class |
+| --- | --- |
+| Background | Panel `bg-surface`; header `bg-surface-secondary` |
+| Border | Header `border-b border-border`; composer dock `border-t border-border` |
+| Border radius | none on the iframe panel (host launcher rounds the frame) |
+| Text — primary | Name `font-display text-sm font-semibold tracking-tight text-text-primary` |
+| Text — secondary | Helper `text-sm leading-relaxed text-text-secondary`; caption `text-xs font-medium text-text-muted` |
+| Spacing | Header `px-4 py-3`; body `p-4 gap-4`; dock `p-4` |
+| Hover / focus | Send uses shared Button; composer disabled in feature 10 |
+| Shadow | none |
+| Accent usage | none in the panel (launcher accent lives in `widget.js`) |
+
+**Pattern notes:**  
+Match `ChatMessage` / `HeroChatMock` bubbles for the welcome. Disabled composer copies `ChatComposer` chrome. Badge: `text-xs font-medium text-text-muted` “Powered by DocuChat” unless `remove_branding`.
+
+### Widget preview
+
+File: `app/w/[publicId]/page.tsx`  
+Last updated: 2026-08-13
+
+| Property | Class |
+| --- | --- |
+| Background | Page `bg-background`; banner `bg-accent-muted` |
+| Border | Banner `border-b border-border` |
+| Layout | Article `max-w-[720px] px-6 py-16` |
+| Title | `font-display text-3xl font-semibold tracking-tight text-text-primary` |
+| Body | `text-base leading-relaxed text-text-secondary` |
+| Caption | `text-sm font-medium text-text-muted` |
+| Shadow | none |
+
+**Pattern notes:**  
+Public, no app shell. Honest banner that this is a DocuChat preview. Unknown ids: same title/body empty pattern as other operate 404s. Launcher comes from `public/widget.js`.
 
 ### Edit bot form
 

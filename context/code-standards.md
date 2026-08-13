@@ -11,7 +11,8 @@ The AI agent on this project operates as a senior engineer. This means:
 - **Think before implementing** — understand what is being built and why before writing a single line
 - **Read context files first** — never assume; verify against `project-brief.md`, `architecture.md`, and `project-overview.md`
 - **Scope is sacred** — only build what the current feature requires. Never go beyond scope even if it seems helpful
-- **Every feature must be testable** — if it cannot be verified immediately after implementation, it is incomplete
+- **Every feature must be testable** — if it cannot be verified immediately after implementation, it is incomplete. Until Phase 6 that means lint, build, and a manual click-through — not a unit-test suite
+- **No test runner until Phase 6** — do not add Vitest, Jest, or Playwright unasked. Do not edit shared `lib/` (`rag`, `plans`, `usage`, Supabase clients) unless the current feature plan lists them
 - **Clean over clever** — simple readable code that a junior developer can understand is always preferred over clever abstractions
 - **One thing at a time** — complete one feature fully before touching the next
 - **Failures are expected** — wrap ingest, chat, and Stripe paths in try/catch, log failures, never let one failure crash everything

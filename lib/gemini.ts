@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, ThinkingLevel } from "@google/genai";
 
 export const EMBEDDING_MODEL = "gemini-embedding-001";
 export const EMBEDDING_DIMENSIONS = 768;
@@ -90,7 +90,7 @@ export async function* streamChatCompletion(params: {
       systemInstruction: params.systemInstruction,
       maxOutputTokens: CHAT_MAX_OUTPUT_TOKENS,
       thinkingConfig: {
-        thinkingLevel: "minimal",
+        thinkingLevel: ThinkingLevel.MINIMAL,
       },
     },
   });

@@ -3,7 +3,9 @@ import type { ReactNode } from "react";
 import { DocumentUpload } from "@/components/bots/DocumentUpload";
 import { DocumentsList } from "@/components/bots/DocumentsList";
 import { EditBotForm } from "@/components/bots/EditBotForm";
+import { EmbedSnippet } from "@/components/bots/EmbedSnippet";
 import { Button } from "@/components/ui/Button";
+import { buildEmbedSnippet, getAppOrigin } from "@/lib/app-url";
 import { getPlanLimits, normalizePlanId } from "@/lib/plans";
 import { createClient } from "@/lib/supabase/server";
 
@@ -35,7 +37,7 @@ export default async function BotDetailPage({
 
   const { data: bot, error } = await supabase
     .from("bots")
-    .select("id, name, welcome_message, system_prompt, created_at")
+    .select("id, name, welcome_message, system_prompt, public_id, created_at")
     .eq("id", id)
     .eq("user_id", user.id)
     .maybeSingle();
@@ -149,6 +151,11 @@ export default async function BotDetailPage({
         />
         <DocumentsList documents={documents} />
       </section>
+
+      <EmbedSnippet
+        snippet={buildEmbedSnippet(getAppOrigin(), bot.public_id)}
+        previewHref={`/w/${bot.public_id}`}
+      />
 
       <div className="mt-8">
         <Button href="/bots" variant="secondary">

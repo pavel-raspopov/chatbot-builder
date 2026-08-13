@@ -55,3 +55,33 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Add an exception: when the project or the current plan names a verification method and there is no test runner, do not add a framework unasked. Follow the plan's verify commands. User instructions and the written plan outrank the TDD iron law.
 
 **Principle:** A skill that mandates tests cannot override a project that has no test runner and a plan that already specified how to verify.
+
+### Observation 6: Drift control without a test suite is scope + typecheck, not TDD theater
+
+**Status:** OPEN
+**Date:** 2026-08-13
+**Session context:** User agreed to defer a test runner until after polished visible functionality, but worried AI would break unrelated code
+**Skill:** test-driven-development / writing-plans / executing-plans
+**Type:** open-source
+**Phase/Area:** When to Use / verification vs drift prevention
+
+**Issue:** Installing a runner and writing tests-after (or TDD on new files only) would not catch edits to existing chat/ingest/quota paths. The drift risk is shared modules (`lib/rag`, `lib/plans`, `lib/usage`, Supabase clients), not the absence of a red-green ritual on brand-new widget UI.
+
+**Suggested improvement:** When the project has no test runner and the user has waived TDD until polish: do not add a framework; name substitute drift controls in the feature plan (files in / files out of scope, lint+build before claiming done, extra caution on shared `lib/`). A test suite becomes the right control once those shared contracts exist and regressions would wreck a demo.
+
+**Principle:** A missing test runner is not permission to skip verification — it means the plan must name the actual drift nets (scope, types, lint, build, manual path) instead of performing TDD against a framework that is not there.
+
+### Observation 7: Plan scope freeze vs a failing shared-lib typecheck at verify
+
+**Status:** OPEN
+**Date:** 2026-08-13
+**Session context:** Implementing 10 embed snippet; plan forbade editing shared lib except listed files; `npm run build` failed in `lib/gemini.ts` on `thinkingLevel: "minimal"` vs SDK enum `ThinkingLevel.MINIMAL`
+**Skill:** writing-plans / executing-plans
+**Type:** open-source
+**Phase/Area:** Global Constraints / files out of scope vs verification commands
+
+**Issue:** The feature plan listed lint+build as the verify gate and also froze `lib/gemini.ts`. The type error was unrelated to embed work (SDK enum vs string literal) but blocked claiming the feature done. Following the freeze would have left a red build; following the verify gate required a one-line shared-lib type fix.
+
+**Suggested improvement:** In plans that freeze shared modules, add an exception: a one-line type/compile fix in a frozen file is allowed when the named verify command fails on it. Record the exception in the session notes. Do not expand into behavior changes.
+
+**Principle:** A file-scope freeze cannot override a plan's own verify command. If lint or build fails in frozen code, a minimal type-only fix is in scope; behavior changes still are not.

@@ -6,9 +6,9 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ## Current Status
 
-**Phase:** Phase 3 — Chat
-**Last completed:** 09 In-app chat UI — `/bots/[id]/chat` + `POST /api/chat` (retrieve, Gemini stream, quota)
-**Next:** 10 Embed snippet + preview
+**Phase:** Phase 4 — Embed Widget
+**Last completed:** 10 Embed snippet + preview — copy-paste script, `widget.js` launcher, `/w/[publicId]` preview
+**Next:** 11 Public widget API + script
 
 ---
 
@@ -34,7 +34,7 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ### Phase 4 — Embed Widget
 
-- [ ] 10 Embed snippet + preview
+- [x] 10 Embed snippet + preview
 - [ ] 11 Public widget API + script
 
 ### Phase 5 — Billing
@@ -50,6 +50,7 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ## Notes
 
+- 2026-08-13 Phase 4 start: embed snippet on bot detail; `public/widget.js` launcher + iframe to `/w/[publicId]/embed`; public preview page; `get_bot_widget_config` RPC (anon). No widget chat API yet.
 - 2026-08-13 Phase 3: in-app chat at `/bots/[id]/chat`; shared `lib/rag/retrieve.ts` + `lib/rag/answer.ts`; `POST /api/chat` SSE; quota via `consume_message_quota` RPC (no service role on the in-app path); resume latest app conversation; no citation chips
 - 2026-08-13 Phase 2 hardening: bot settings edit, Storage API delete on bot remove, pending Retry, ingest 409 unless `force`, billing usage page (no Stripe yet), documents column lock (`status`/`error` only)
 - Source of truth for requirements: `context/project-brief.md`

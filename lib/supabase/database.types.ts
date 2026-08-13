@@ -273,6 +273,17 @@ export type Database = {
           used: number
         }[]
       }
+      get_bot_widget_config: {
+        Args: {
+          p_public_id: string
+        }
+        Returns: {
+          name: string
+          public_id: string
+          remove_branding: boolean
+          welcome_message: string
+        }[]
+      }
       match_chunks: {
         Args: {
           p_bot_id: string

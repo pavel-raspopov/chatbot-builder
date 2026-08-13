@@ -61,6 +61,7 @@ MCP (when relevant) → Skills via AGENTS.md → This file (project rules) → G
 - `vector` lives in schema `extensions`; `chunks.embedding` is `vector(768)` with **HNSW** (`vector_cosine_ops`).
 - RPC: `match_chunks(p_bot_id, p_query_embedding, p_match_count)` — `SECURITY INVOKER` so RLS applies; service role bypasses RLS for widget later.
 - RPC: `consume_message_quota(p_max)` — `SECURITY DEFINER`, scoped to `auth.uid()`; authenticated cannot UPDATE profile quota columns directly. Plan caps stay in `lib/plans.ts`.
+- RPC: `get_bot_widget_config(p_public_id)` — `SECURITY DEFINER`, returns only `public_id`, `name`, `welcome_message`, `remove_branding` for the embed preview. `EXECUTE` granted to `anon` (intentional). Never returns `system_prompt` or `user_id`.
 - Profiles: `handle_new_user` trigger on `auth.users`; `EXECUTE` revoked from `anon`/`authenticated` (trigger-only).
 - Storage bucket `documents` is private; object path first folder = `auth.uid()`.
 - Documents: authenticated `UPDATE` is column-limited to `status` and `error` (`protect_documents_quota_columns`). Delete files with `storage.remove` (not SQL) before or with the row delete — `deleteDocument` and `deleteBot` both do this.
@@ -70,6 +71,7 @@ MCP (when relevant) → Skills via AGENTS.md → This file (project rules) → G
 - Prefer `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (`sb_publishable_…`).
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` (legacy JWT) is accepted as fallback.
 - `SUPABASE_SERVICE_ROLE_KEY` server-only — never expose to the browser.
+- `NEXT_PUBLIC_APP_URL` — public origin for the copy-paste embed snippet (`lib/app-url.ts`). Fallback `http://localhost:3000`.
 
 ### Rules
 
@@ -120,7 +122,7 @@ export const gemini = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 
 Use `embedTexts()` in `lib/gemini.ts` for ingest (`taskType: RETRIEVAL_DOCUMENT`) and chat retrieval (`RETRIEVAL_QUERY`). Store vectors as `[…]` strings for PostgREST/`vector(768)`.
 
-Chat completions: `streamChatCompletion()` (`gemini-3.6-flash`, `maxOutputTokens: 1024`). Do not set `temperature` (deprecated on Gemini 3.x). Set `thinkingConfig.thinkingLevel` to `minimal` so RAG answers do not spend 10–50s in default medium thinking before the first token. Retrieval: `lib/rag/retrieve.ts` → `match_chunks` (k=8, similarity floor 0.25). Grounded stream: `lib/rag/answer.ts`. In-app route: authenticated `POST /api/chat` (SSE). Empty retrieval returns “I don’t know from your docs” without calling Gemini. Message quota: `lib/usage.ts` → `consume_message_quota` RPC before the stream.
+Chat completions: `streamChatCompletion()` (`gemini-3.6-flash`, `maxOutputTokens: 1024`). Do not set `temperature` (deprecated on Gemini 3.x). Set `thinkingConfig.thinkingLevel` to `ThinkingLevel.MINIMAL` (SDK enum; a `"minimal"` string fails the current types) so RAG answers do not spend 10–50s in default medium thinking before the first token. Retrieval: `lib/rag/retrieve.ts` → `match_chunks` (k=8, similarity floor 0.25). Grounded stream: `lib/rag/answer.ts`. In-app route: authenticated `POST /api/chat` (SSE). Empty retrieval returns “I don’t know from your docs” without calling Gemini. Message quota: `lib/usage.ts` → `consume_message_quota` RPC before the stream.
 
 ---
 
@@ -167,10 +169,12 @@ Defined also in `project-overview.md` / `PRODUCT.md`:
 
 ## Embed widget script
 
-- Ship `public/widget.js` (vanilla JS) or a tiny built IIFE — avoid requiring React on customer sites.
-- Config via `data-bot` (public_id) and optional `data-color` later.
-- Call `NEXT_PUBLIC_APP_URL/api/widget/chat`.
-- Show “Powered by DocuChat” unless plan allows `remove_branding`.
+- Ship `public/widget.js` (vanilla JS IIFE) — no React on customer sites.
+- Config via `data-bot` (`public_id`). Script origin comes from `script.src`.
+- Launcher injects a floating button + iframe to `/w/{public_id}/embed`.
+- The iframe panel is Next.js (tokens). Live chat API is feature 11 (`/api/widget/chat`).
+- Show “Powered by DocuChat” unless `remove_branding` is true (toggle ships in billing).
+- **Launcher CSS exception:** `widget.js` copies token hex from `ui-tokens.md` into inline styles because the host page has no Tailwind. Do not use hex in React/Tailwind components.
 
 ---
 

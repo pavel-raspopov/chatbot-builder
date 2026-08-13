@@ -252,12 +252,22 @@ Centered column (`max-w-md` auth): Literata brand in `text-accent`, page title L
 - Narrow (≥300px): brand + Sign out on the first row; links wrap below. Do not keep one unwrapping row — that overflows and leaves a side gap
 - Components: `components/layout/AppNavbar.tsx`, `AppFooter.tsx`
 
-### Chat (marketing mock + future app)
+### Chat (marketing mock + in-app)
 
 - Stacked bubbles; user on `bg-accent-muted`; assistant on `bg-surface-secondary` + border — not rainbow accents
 - Composer row: bordered surface field + accent send control
 - Live thread: `/bots/[id]/chat` — `ChatThread` panel `rounded-lg border-border shadow-card`, sticky composer, empty-docs state, `focus-visible` on links/send
 - Waiting: three muted bouncing dots (`ChatThinkingDots`) until the first token; honor `prefers-reduced-motion`
+
+### Embed widget
+
+Public snippet on bot detail; host-page launcher is `public/widget.js`; panel is an iframe to `/w/[publicId]/embed`.
+
+- **Launcher:** 56px forest circle, bottom-right; host pages have no Tailwind — token hex from `ui-tokens.md` may be inlined in `widget.js` only
+- **Panel:** `bg-surface`, header `bg-surface-secondary`, same assistant bubble tokens as in-app chat, composer chrome matching `ChatComposer`
+- **Badge:** muted “Powered by DocuChat” unless `remove_branding`
+- **Preview:** `/w/[publicId]` — no app shell; honest `bg-accent-muted` banner; sample article `max-w-[720px]`
+- Surface brief: `.impeccable/surfaces/embed.md`
 
 ### Pricing
 
@@ -268,7 +278,7 @@ Centered column (`max-w-md` auth): Literata brand in `text-accent`, page title L
 
 ### Do
 
-- **Do** use token utilities from `app/globals.css` / `context/ui-tokens.md` only.
+- **Do** use token utilities from `app/globals.css` / `context/ui-tokens.md` only (exception: `public/widget.js` launcher may copy those hex values).
 - **Do** read `context/ui-registry.md` before building; run `/imprint` after.
 - **Do** keep marketing claims tied to real product capabilities.
 - **Do** prefer “I don’t know from your docs” honesty in empty/error copy.
@@ -277,7 +287,7 @@ Centered column (`max-w-md` auth): Literata brand in `text-accent`, page title L
 
 ### Don't
 
-- **Don't** hardcode hex or raw Tailwind palette classes in components.
+- **Don't** hardcode hex or raw Tailwind palette classes in React/Tailwind components (`public/widget.js` launcher may copy token hex because the host page has no Tailwind).
 - **Don't** fabricate testimonials, logos, or user counts.
 - **Don't** add purple gradients, glassmorphism stacks, or pill-stat strips in the hero.
 - **Don't** split landing and app into unrelated visual languages.

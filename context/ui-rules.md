@@ -101,9 +101,10 @@ Items: Dashboard, Bots, Billing (+ Sign out).
 
 ## Widget
 
-- Floating launcher bottom-right on customer sites
-- Panel readable on light marketing pages
+- Floating launcher bottom-right on customer sites (`public/widget.js`)
+- Panel is an iframe to `/w/[publicId]/embed` — tokens, welcome bubble, disabled composer until feature 11
 - Free plan: visible “Powered by DocuChat” footer in panel
+- Host-page launcher may copy token hex into inline CSS; iframe panel uses token classes only
 
 ---
 

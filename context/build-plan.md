@@ -111,7 +111,7 @@ Record screenshare + voiceover: signup → upload → in-app chat → embed on s
 - [x] 07 Bot detail — docs upload
 - [x] 08 Ingest / RAG indexing
 - [x] 09 In-app chat UI
-- [ ] 10 Embed snippet + preview
+- [x] 10 Embed snippet + preview
 - [ ] 11 Public widget API + script
 - [ ] 12 Pricing gates + Stripe test Checkout
 - [ ] 13 Polish

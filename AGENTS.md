@@ -64,7 +64,7 @@ Read in this exact order before any implementation:
 - `/brainstorming` – before any new feature or UI. Explore requirements & design.
 - `/writing-plans` – before implementing complex features. Create step-by-step specs.
 - `/executing-plans` – when executing a step-by-step implementation plan.
-- `/test-driven-development` – when writing new code or fixes. Write failing tests first.
+- `/test-driven-development` – waived until Phase 6 (no test runner). Use lint, build, and a manual click-through; do not add a test framework unasked.
 - `/systematic-debugging` – when facing bugs or test failures. Find root cause first.
 - `/verification-before-completion` – before marking task complete. Test, build, and validate.
 - `/task-observer` – invoke at the start of every task-oriented session. Watches the session for skill improvement opportunities and logs observations.

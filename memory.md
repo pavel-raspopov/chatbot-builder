@@ -1,41 +1,47 @@
-# Memory — 09 In-app chat UI
+# Memory — 10 Embed snippet + preview
 
 Last updated: 2026-08-13 (evening)
 
 ## What was built
 
-- In-app chat at `/bots/[id]/chat`: `ChatThread`, `ChatMessage`, `ChatComposer`, `ChatThinkingDots`
-- Entry points: **Open chat** on bot detail, **Chat** on bots list
-- `POST /api/chat` SSE: retrieve (`lib/rag/retrieve.ts`) → Gemini stream (`lib/rag/answer.ts`) → persist `conversations`/`messages`
-- Quota: `consume_message_quota` RPC (user JWT, `SECURITY DEFINER` on `auth.uid()` only) via `lib/usage.ts` — not the service-role client
-- `lib/supabase/admin.ts` exists for Stripe/widget later; unused on the in-app chat path
-- Surface brief: `.impeccable/surfaces/chat.md`
+- Bot detail Embed section: `components/bots/EmbedSnippet.tsx` (copy snippet + Preview)
+- `public/widget.js` — vanilla launcher (floating button + iframe); no chat API
+- Public `/w/[publicId]` fake-site preview and `/w/[publicId]/embed` panel (`WidgetPanel`)
+- RPC `get_bot_widget_config(p_public_id)` — anon-safe; returns name, welcome, `remove_branding` only
+- `lib/widget/getBotConfig.ts`, `lib/app-url.ts` (`NEXT_PUBLIC_APP_URL`, fallback `http://localhost:3000`)
+- Embed route CSP `frame-ancestors *` in `next.config.ts`
+- Surfaces: `.impeccable/surfaces/embed.md`; DESIGN.md Embed widget section (merged, not full overwrite)
 
 ## Decisions made
 
-- Resume latest `source=app` conversation; no sidebar; no citation chips
-- Empty/low-similarity retrieval skips Gemini and says it does not know from the docs (still counts as a message)
-- Chat model is `gemini-3.6-flash` (`thinkingLevel: minimal`); `gemini-2.5-flash` is unavailable to new API keys
-- Expected 4xx (quota) is UI-only; do not `console.error` on the client. Browser Network 429 is normal
-- Free `maxMessagesPerMonth` is 100 (temp test cap of 5/6 was reverted)
+- Stub script now, live answers in 11
+- Iframe panel (React/tokens) instead of Shadow DOM; launcher stays vanilla JS
+- Public bot lookup via SECURITY DEFINER RPC, not service role (local `.env.local` has no service role)
+- No branding toggle in 10 — badge follows `remove_branding` (default false)
+- Launcher may copy token hex into `widget.js`; iframe panel uses token classes only
+- Cross-origin local test is supported: paste snippet into another app on a different port while DocuChat runs on 3000
 
 ## Problems solved
 
-- In-app quota cannot use authenticated `UPDATE` on `profiles` (column lock) and local `.env.local` has no service role key — RPC instead
-- `gemini-2.5-flash` 404 for new keys — switched to `gemini-3.6-flash` and dropped `temperature`
-- Default Gemini 3.x medium thinking caused 10–50s TTFB — set `thinkingLevel: minimal`
-- Flashing caret while waiting — bouncing dots until first token
+- Owner-only RLS on `bots` blocked public preview SELECT — RPC instead of admin client
+- `npm run build` failed on `thinkingLevel: "minimal"` vs SDK enum — set `ThinkingLevel.MINIMAL` in `lib/gemini.ts` (type-only; not a chat behavior change)
 
 ## Current state
 
-- Phase 3 item 09 complete; user verified grounded answers, don’t-know, resume thread, quota 429 + billing link
-- No widget embed, no Stripe Checkout
-- Lint/build were green when 09 shipped
+- Phase 4 item 10 complete; user verified chrome looks fine
+- Widget shows welcome + disabled composer; no `/api/widget/chat`, no quota on embed
+- Snippet `src` is absolute via `getAppOrigin()`; preview page loads relative `/widget.js`
+- Lint/build green when 10 shipped
 
 ## Next session starts with
 
-**10 Embed snippet + preview** — copy-paste script on bot detail; optional `/w/[publicId]` preview. Then 11 public widget API + `widget.js`.
+**11 Public widget API + script** — `POST /api/widget/chat` (CORS, rate limits, same RAG as in-app), wire the panel composer, persist `source=widget` conversations. Then 12 Stripe.
 
 ## Open questions
 
-- None blocking 10.
+- None blocking 11.
+
+## 2026-08-13 — Tests / TDD
+
+- No test runner until Phase 6. Verify with `npm run lint`, `npm run build`, and a manual click-through.
+- TDD waived. Do not edit shared `lib/` (`rag`, `plans`, `usage`, Supabase clients) unless the feature plan lists them. A one-line type/compile fix in frozen code is allowed if the named verify command fails on it.
