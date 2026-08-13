@@ -62,6 +62,7 @@ MCP (when relevant) → Skills via AGENTS.md → This file (project rules) → G
 - RPC: `match_chunks(p_bot_id, p_query_embedding, p_match_count)` — `SECURITY INVOKER` so RLS applies; service role bypasses RLS for widget later.
 - Profiles: `handle_new_user` trigger on `auth.users`; `EXECUTE` revoked from `anon`/`authenticated` (trigger-only).
 - Storage bucket `documents` is private; object path first folder = `auth.uid()`.
+- Documents: authenticated `UPDATE` is column-limited to `status` and `error` (`protect_documents_quota_columns`). Delete files with `storage.remove` (not SQL) before or with the row delete — `deleteDocument` and `deleteBot` both do this.
 
 ### Env
 
@@ -84,6 +85,7 @@ MCP (when relevant) → Skills via AGENTS.md → This file (project rules) → G
 - Protect `/dashboard`, `/bots`, `/settings/*` in `lib/supabase/proxy.ts`; redirect authed users away from `/login` and `/signup`.
 - `profiles` row created on signup via `handle_new_user` trigger (backfilled for existing users).
 - Profiles billing/usage columns are **not** client-updatable: `REVOKE UPDATE` from `authenticated`/`anon`; service_role writes plan/Stripe/usage. See migration `protect_profiles_billing_columns`.
+- Plan limits live in `lib/plans.ts` and are checked in Server Actions. RLS is ownership only.
 - For local demo: Auth → Providers → Email → disable **Confirm email** so signup returns a session immediately.
 
 ---
@@ -156,6 +158,7 @@ Defined also in `project-overview.md` / `PRODUCT.md`:
 - Accept `.pdf`, `.md`, `.txt` in MVP (`lib/rag/extract.ts`).
 - On extract failure: set `documents.status = failed` with a user-visible error — never silent fail.
 - Ingest pipeline: `lib/rag/ingest.ts` + `POST /api/ingest` (user session / RLS; no service role yet).
+- Concurrent ingest: a second request while `status = processing` returns 409 unless `force: true` (Retry). Client timeout copy tells the user indexing may still be running.
 
 ---
 

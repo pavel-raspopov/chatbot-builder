@@ -213,7 +213,7 @@ Quiet, confident controls — forest fill for the primary action, paper + border
 - **Shape:** control radius (8px)
 - **Primary:** `bg-accent` + `text-accent-foreground`, `px-4 py-2`, `text-sm font-medium`; hover `bg-accent-dark`
 - **Secondary:** `bg-surface` + `border-border` + `text-text-primary`; hover `bg-surface-secondary`
-- **Focus:** `focus:outline-none focus:ring-1 focus:ring-accent`
+- **Focus:** `focus:outline-none focus-visible:ring-1 focus-visible:ring-accent` (keyboard only — no ring after a mouse click)
 - **API:** `components/ui/Button.tsx` — `href` renders `Link`, else `<button>`
 
 ### Cards / Containers
@@ -249,6 +249,7 @@ Centered column (`max-w-md` auth): Literata brand in `text-accent`, page title L
 - Same sticky surface + blur tokens as marketing; Literata wordmark → `/dashboard`
 - Links: Dashboard, Bots, Billing — active `text-accent`, inactive `text-text-secondary` (color only)
 - Sign out: secondary `Button` + Server Action form
+- Narrow (≥300px): brand + Sign out on the first row; links wrap below. Do not keep one unwrapping row — that overflows and leaves a side gap
 - Components: `components/layout/AppNavbar.tsx`, `AppFooter.tsx`
 
 ### Chat (marketing mock + future app)
@@ -270,6 +271,7 @@ Centered column (`max-w-md` auth): Literata brand in `text-accent`, page title L
 - **Do** keep marketing claims tied to real product capabilities.
 - **Do** prefer “I don’t know from your docs” honesty in empty/error copy.
 - **Do** honor `prefers-reduced-motion` for landing motion (`.animate-fade-up`, `.animate-hero-mock`).
+- **Do** keep operate chrome usable from 300px with no horizontal overflow or side gaps.
 
 ### Don't
 
@@ -278,3 +280,4 @@ Centered column (`max-w-md` auth): Literata brand in `text-accent`, page title L
 - **Don't** add purple gradients, glassmorphism stacks, or pill-stat strips in the hero.
 - **Don't** split landing and app into unrelated visual languages.
 - **Don't** use accent-colored thick left borders as decorative section markers.
+- **Don't** leave a persistent `focus:ring` on links or buttons after a mouse click — use `focus-visible`.

@@ -89,7 +89,7 @@ export default async function NewBotPage(): Promise<ReactNode> {
       <p className="text-sm text-text-secondary">
         <Link
           href="/bots"
-          className="font-medium text-accent hover:text-accent-dark focus:outline-none focus:ring-1 focus:ring-accent"
+          className="font-medium text-accent hover:text-accent-dark focus:outline-none focus-visible:ring-1 focus-visible:ring-accent"
         >
           Bots
         </Link>

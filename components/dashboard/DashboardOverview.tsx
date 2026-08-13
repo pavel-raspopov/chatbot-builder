@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/Button";
+import { UsageMeter } from "@/components/ui/UsageMeter";
 
 export type DashboardOverviewProps = {
   email: string;
@@ -9,48 +10,9 @@ export type DashboardOverviewProps = {
   maxBots: number;
   messagesUsed: number;
   maxMessages: number;
+  atBotLimit: boolean;
   showUpgrade: boolean;
 };
-
-function UsageMeter({
-  label,
-  used,
-  limit,
-}: {
-  label: string;
-  used: number;
-  limit: number;
-}): ReactNode {
-  const atLimit = used >= limit;
-
-  return (
-    <div>
-      <div className="flex items-baseline justify-between gap-4">
-        <p className="text-sm font-medium text-text-primary">{label}</p>
-        <p
-          className={`text-sm tabular-nums ${atLimit ? "text-warning" : "text-text-secondary"}`}
-        >
-          {used} / {limit}
-        </p>
-      </div>
-      <div
-        className="mt-2 h-1.5 w-full overflow-hidden rounded-sm bg-surface-secondary"
-        role="meter"
-        aria-label={label}
-        aria-valuemin={0}
-        aria-valuemax={limit}
-        aria-valuenow={Math.min(used, limit)}
-      >
-        <div
-          className={`h-full rounded-sm ${atLimit ? "bg-warning" : "bg-accent"}`}
-          style={{
-            width: `${Math.min(100, limit === 0 ? 100 : (used / limit) * 100)}%`,
-          }}
-        />
-      </div>
-    </div>
-  );
-}
 
 export function DashboardOverview({
   email,
@@ -60,6 +22,7 @@ export function DashboardOverview({
   maxBots,
   messagesUsed,
   maxMessages,
+  atBotLimit,
   showUpgrade,
 }: DashboardOverviewProps): ReactNode {
   const isEmpty = botCount === 0;
@@ -103,10 +66,16 @@ export function DashboardOverview({
       ) : null}
 
       <div className="mt-8 flex flex-wrap gap-3">
-        <Button href="/bots/new" variant="primary">
-          Create bot
-        </Button>
-        {showUpgrade ? (
+        {atBotLimit ? (
+          <Button href="/settings/billing" variant="primary">
+            Upgrade
+          </Button>
+        ) : (
+          <Button href="/bots/new" variant="primary">
+            Create bot
+          </Button>
+        )}
+        {showUpgrade && !atBotLimit ? (
           <Button href="/settings/billing" variant="secondary">
             Upgrade
           </Button>

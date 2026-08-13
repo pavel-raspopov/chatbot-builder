@@ -30,7 +30,7 @@ export default function RootLayout({
       lang="en"
       className={`${publicSans.variable} ${literata.variable}`}
     >
-      <body className="min-h-dvh bg-background font-sans text-text-primary antialiased">
+      <body className="min-h-dvh overflow-x-hidden bg-background font-sans text-text-primary antialiased">
         {children}
       </body>
     </html>

@@ -53,6 +53,7 @@ export async function ingestDocument(
   supabase: AppSupabase,
   documentId: string,
   userId: string,
+  options?: { force?: boolean },
 ): Promise<IngestResult> {
   if (!documentId) {
     return { success: false, error: "Missing document id.", statusCode: 400 };
@@ -81,6 +82,14 @@ export async function ingestDocument(
 
   if (document.user_id !== userId) {
     return { success: false, error: "Document not found.", statusCode: 404 };
+  }
+
+  if (document.status === "processing" && !options?.force) {
+    return {
+      success: false,
+      error: "This file is already indexing. Refresh in a moment, or use Retry if it stays stuck.",
+      statusCode: 409,
+    };
   }
 
   try {

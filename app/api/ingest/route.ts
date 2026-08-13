@@ -4,15 +4,28 @@ import { createClient } from "@/lib/supabase/server";
 
 export const maxDuration = 60;
 
-type IngestBody = {
-  documentId?: unknown;
-};
+function readIngestBody(value: unknown): {
+  documentId: string;
+  force: boolean;
+} {
+  if (typeof value !== "object" || value === null) {
+    return { documentId: "", force: false };
+  }
+
+  const documentIdValue = "documentId" in value ? value.documentId : undefined;
+  const forceValue = "force" in value ? value.force : undefined;
+  const documentId =
+    typeof documentIdValue === "string" ? documentIdValue.trim() : "";
+  const force = forceValue === true;
+
+  return { documentId, force };
+}
 
 export async function POST(request: Request): Promise<NextResponse> {
   try {
-    let body: IngestBody;
+    let raw: unknown;
     try {
-      body = (await request.json()) as IngestBody;
+      raw = await request.json();
     } catch {
       return NextResponse.json(
         { success: false, error: "Invalid JSON body." },
@@ -20,8 +33,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       );
     }
 
-    const documentId =
-      typeof body.documentId === "string" ? body.documentId.trim() : "";
+    const { documentId, force } = readIngestBody(raw);
 
     if (!documentId) {
       return NextResponse.json(
@@ -42,7 +54,9 @@ export async function POST(request: Request): Promise<NextResponse> {
       );
     }
 
-    const result = await ingestDocument(supabase, documentId, user.id);
+    const result = await ingestDocument(supabase, documentId, user.id, {
+      force,
+    });
 
     if (!result.success) {
       return NextResponse.json(

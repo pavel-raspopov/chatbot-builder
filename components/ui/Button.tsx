@@ -23,9 +23,9 @@ export type ButtonProps = ButtonAsButton | ButtonAsLink;
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "inline-flex items-center justify-center rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-dark focus:outline-none focus:ring-1 focus:ring-accent",
+    "inline-flex items-center justify-center rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-dark focus:outline-none focus-visible:ring-1 focus-visible:ring-accent",
   secondary:
-    "inline-flex items-center justify-center rounded-md border border-border bg-surface px-4 py-2 text-sm font-medium text-text-primary transition-colors hover:bg-surface-secondary focus:outline-none focus:ring-1 focus:ring-accent",
+    "inline-flex items-center justify-center rounded-md border border-border bg-surface px-4 py-2 text-sm font-medium text-text-primary transition-colors hover:bg-surface-secondary focus:outline-none focus-visible:ring-1 focus-visible:ring-accent",
 };
 
 export function Button({
@@ -45,6 +45,7 @@ export function Button({
     );
   }
 
+  // After the href guard, remaining props are the button branch of the union.
   const buttonProps = props as ButtonAsButton;
   return (
     <button type={buttonProps.type ?? "button"} className={classes} {...buttonProps}>

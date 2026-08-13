@@ -50,6 +50,7 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ## Notes
 
+- 2026-08-13 Phase 2 hardening: bot settings edit, Storage API delete on bot remove, pending Retry, ingest 409 unless `force`, billing usage page (no Stripe yet), documents column lock (`status`/`error` only)
 - Source of truth for requirements: `context/project-brief.md`
 - Stack: Supabase + Gemini + Stripe test — never InsForge / OpenAI for chatbot
 - App scaffolded: Next.js 16 App Router, Tailwind CSS v4 `@theme` tokens, Literata + Public Sans

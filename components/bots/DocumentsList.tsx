@@ -40,7 +40,15 @@ export function DocumentsList({ documents }: DocumentsListProps): ReactNode {
   const [action, setAction] = useState<"delete" | "retry" | null>(null);
   const isEmpty = documents.length === 0;
 
-  function handleDelete(documentId: string): void {
+  function handleDelete(documentId: string, filename: string): void {
+    if (
+      !window.confirm(
+        `Delete “${filename}”? This removes the file and its indexed chunks.`,
+      )
+    ) {
+      return;
+    }
+
     setError(null);
     setActiveId(documentId);
     setAction("delete");
@@ -61,7 +69,7 @@ export function DocumentsList({ documents }: DocumentsListProps): ReactNode {
     setActiveId(documentId);
     setAction("retry");
     startTransition(async () => {
-      const result = await requestDocumentIngest(documentId);
+      const result = await requestDocumentIngest(documentId, { force: true });
       setActiveId(null);
       setAction(null);
       if (!result.success) {
@@ -102,7 +110,9 @@ export function DocumentsList({ documents }: DocumentsListProps): ReactNode {
           const deleting = rowBusy && action === "delete";
           const retrying = rowBusy && action === "retry";
           const canRetry =
-            doc.status === "failed" || doc.status === "processing";
+            doc.status === "failed" ||
+            doc.status === "processing" ||
+            doc.status === "pending";
           const showError = doc.status === "failed" && doc.error;
 
           return (
@@ -139,7 +149,7 @@ export function DocumentsList({ documents }: DocumentsListProps): ReactNode {
                   type="button"
                   variant="secondary"
                   disabled={isPending}
-                  onClick={() => handleDelete(doc.id)}
+                  onClick={() => handleDelete(doc.id, doc.filename)}
                 >
                   {deleting ? "Deleting…" : "Delete"}
                 </Button>

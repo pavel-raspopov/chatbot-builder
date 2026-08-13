@@ -9,9 +9,16 @@ export type CreateBotActionState = {
   error: string | null;
 };
 
+export type UpdateBotActionState = {
+  error: string | null;
+  message: string | null;
+};
+
 export type DeleteBotResult =
   | { success: true }
   | { success: false; error: string };
+
+const STORAGE_REMOVE_BATCH = 1000;
 
 const DEFAULT_WELCOME = "Hi! How can I help you today?";
 
@@ -100,6 +107,65 @@ export async function createBot(
   }
 }
 
+export async function updateBot(
+  _prev: UpdateBotActionState,
+  formData: FormData,
+): Promise<UpdateBotActionState> {
+  try {
+    const botId = readString(formData, "bot_id");
+    const name = readString(formData, "name");
+    const welcomeMessage = readString(formData, "welcome_message");
+    const systemPrompt = readString(formData, "system_prompt");
+
+    if (!botId) {
+      return { error: "Missing bot id.", message: null };
+    }
+
+    if (!name) {
+      return { error: "Bot name is required.", message: null };
+    }
+
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { error: "You need to sign in to update this bot.", message: null };
+    }
+
+    const { data, error } = await supabase
+      .from("bots")
+      .update({
+        name,
+        welcome_message: welcomeMessage || DEFAULT_WELCOME,
+        system_prompt: systemPrompt,
+      })
+      .eq("id", botId)
+      .eq("user_id", user.id)
+      .select("id")
+      .maybeSingle();
+
+    if (error) {
+      console.error("[actions/bots] updateBot", error);
+      return { error: "Failed to save bot. Please try again.", message: null };
+    }
+
+    if (!data) {
+      return { error: "Bot not found.", message: null };
+    }
+
+    revalidatePath("/bots");
+    revalidatePath("/dashboard");
+    revalidatePath(`/bots/${botId}`);
+    return { error: null, message: "Bot settings saved." };
+  } catch (error) {
+    unstable_rethrow(error);
+    console.error("[actions/bots] updateBot", error);
+    return { error: "Something went wrong. Please try again.", message: null };
+  }
+}
+
 export async function deleteBot(botId: string): Promise<DeleteBotResult> {
   try {
     if (!botId) {
@@ -113,6 +179,52 @@ export async function deleteBot(botId: string): Promise<DeleteBotResult> {
 
     if (!user) {
       return { success: false, error: "You need to sign in to delete a bot." };
+    }
+
+    const { data: bot, error: botError } = await supabase
+      .from("bots")
+      .select("id")
+      .eq("id", botId)
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (botError) {
+      console.error("[actions/bots] deleteBot load", botError);
+      return { success: false, error: "Could not load this bot. Please try again." };
+    }
+
+    if (!bot) {
+      return { success: false, error: "Bot not found." };
+    }
+
+    const { data: documents, error: docsError } = await supabase
+      .from("documents")
+      .select("storage_path")
+      .eq("bot_id", botId)
+      .eq("user_id", user.id);
+
+    if (docsError) {
+      console.error("[actions/bots] deleteBot documents", docsError);
+      return {
+        success: false,
+        error: "Could not load this bot's files. Please try again.",
+      };
+    }
+
+    const paths = (documents ?? [])
+      .map((row) => row.storage_path)
+      .filter((path) => path.length > 0);
+
+    for (let i = 0; i < paths.length; i += STORAGE_REMOVE_BATCH) {
+      const batch = paths.slice(i, i + STORAGE_REMOVE_BATCH);
+      const { error: storageError } = await supabase.storage
+        .from("documents")
+        .remove(batch);
+
+      if (storageError) {
+        // Official Storage API delete; continue so the bot row can still be removed.
+        console.error("[actions/bots] deleteBot storage", storageError);
+      }
     }
 
     const { error, count } = await supabase

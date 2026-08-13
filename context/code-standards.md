@@ -22,7 +22,7 @@ The AI agent on this project operates as a senior engineer. This means:
 
 - Strict mode enabled in tsconfig.json — no exceptions
 - Never use `any` — use `unknown` and narrow the type
-- Never use type assertions (`as SomeType`) unless absolutely necessary and commented why
+- Prefer narrowing over `as`. `as` is allowed after `JSON.parse` / `FormData.get` when you immediately narrow the value; do not use `as` to silence real type errors
 - All function parameters and return types must be explicitly typed
 - Use `type` for object shapes and unions — use `interface` only for extendable component props
 - All async functions must have proper error handling — never let promises float unhandled
@@ -90,7 +90,8 @@ export function ComponentName({ botId }: Props) {
 
 - Never use default exports for components — always named exports
 - Props type defined directly above the component — not in a separate types file unless shared
-- No inline styles — all styling via Tailwind classes using CSS variables from `ui-tokens.md`
+- No hardcoded colors or raw Tailwind palette classes — use tokens from `ui-tokens.md`
+- Dynamic layout values that cannot be tokens (e.g. meter `width` percent) may use a single inline style
 
 ---
 
@@ -105,7 +106,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     // validate body
     // business logic
-    return NextResponse.json({ success: true, data: result });
+    return NextResponse.json({ success: true, chunkCount: result.chunkCount });
   } catch (error) {
     console.error("[api/chat]", error);
     return NextResponse.json(
@@ -119,8 +120,8 @@ export async function POST(req: NextRequest) {
 - Every route handler has a try/catch
 - Every route handler validates the request body before processing
 - Errors are logged with the route path as prefix: `[api/chat]`
-- Always return `{ success: boolean, data?: T, error?: string }`
-- Never return raw data without the success wrapper
+- Always return `{ success: boolean, error?: string }` plus any extra fields the client needs (`chunkCount`, `data`, …)
+- Never return a bare payload without `success`
 
 ---
 
@@ -188,7 +189,7 @@ export async function signIn(
 ```
 
 - Do **not** force `{ success }` onto `useActionState` flows — the hook needs a stable UI state shape
-- Always `unstable_rethrow(error)` inside catch so `redirect()` / `notFound()` still work (Next.js docs)
+- Always `unstable_rethrow(error)` inside catch so `redirect()` / `notFound()` still work (Next.js 16.3 docs; the API is still marked unstable)
 - `redirect()` after successful auth is preferred over returning success and navigating on the client
 
 ---
@@ -209,6 +210,9 @@ import { createAdminClient } from "@/lib/supabase/admin";
 - Never import the admin/service-role client into Client Components
 - Prefer RLS + user client for owner CRUD
 - Always check `error` from Supabase responses
+- Plan numbers (bots, messages, storage) are enforced in Server Actions / Route Handlers from `lib/plans.ts`. RLS is ownership only — do not duplicate plan limits in SQL
+- Lock quota/identity columns with Postgres column privileges (same pattern as `profiles`). Authenticated `UPDATE` on `documents` is `status` and `error` only
+- Delete Storage objects with the Storage API (`storage.remove`), not SQL. See Supabase “Delete Objects” docs
 
 ---
 

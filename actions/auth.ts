@@ -8,15 +8,20 @@ export type AuthActionState = {
   message: string | null;
 };
 
-function readCredential(
-  formData: FormData,
-  field: "email" | "password",
-): string {
-  const value = formData.get(field);
+function readEmail(formData: FormData): string {
+  const value = formData.get("email");
   if (typeof value !== "string") {
     return "";
   }
   return value.trim();
+}
+
+function readPassword(formData: FormData): string {
+  const value = formData.get("password");
+  if (typeof value !== "string") {
+    return "";
+  }
+  return value;
 }
 
 function safeNextPath(raw: FormDataEntryValue | null): string {
@@ -31,8 +36,8 @@ export async function signIn(
   formData: FormData,
 ): Promise<AuthActionState> {
   try {
-    const email = readCredential(formData, "email");
-    const password = readCredential(formData, "password");
+    const email = readEmail(formData);
+    const password = readPassword(formData);
     const next = safeNextPath(formData.get("next"));
 
     if (!email || !password) {
@@ -62,8 +67,8 @@ export async function signUp(
   formData: FormData,
 ): Promise<AuthActionState> {
   try {
-    const email = readCredential(formData, "email");
-    const password = readCredential(formData, "password");
+    const email = readEmail(formData);
+    const password = readPassword(formData);
 
     if (!email || !password) {
       return { error: "Email and password are required.", message: null };

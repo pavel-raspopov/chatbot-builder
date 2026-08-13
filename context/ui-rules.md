@@ -53,6 +53,7 @@ Items: Dashboard, Bots, Billing (+ Sign out).
 - Inactive: `text-text-secondary`
 - No underline — color change only
 - Components: `components/layout/AppNavbar.tsx`, `AppFooter.tsx`
+- All three nav items stay visible on narrow screens
 ---
 
 ## Auth / Operate gates (shipped)
@@ -82,7 +83,8 @@ Items: Dashboard, Bots, Billing (+ Sign out).
 - Buttons/inputs: `rounded-md`
 - Prefer no decorative cards in the hero (the chat mock is the product visual, not a promo card stack)
 - Cards allowed when they contain interaction (pricing CTAs, bot list items, chat panels)
-- Focus: `focus:outline-none focus:ring-1 focus:ring-accent`
+- Focus (fields): `focus:outline-none focus:ring-1 focus:ring-accent`
+- Focus (links / buttons): `focus:outline-none focus-visible:ring-1 focus-visible:ring-accent`
 
 ---
 

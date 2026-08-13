@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { DocumentUpload } from "@/components/bots/DocumentUpload";
 import { DocumentsList } from "@/components/bots/DocumentsList";
+import { EditBotForm } from "@/components/bots/EditBotForm";
 import { Button } from "@/components/ui/Button";
 import { getPlanLimits, normalizePlanId } from "@/lib/plans";
 import { createClient } from "@/lib/supabase/server";
@@ -87,7 +88,7 @@ export default async function BotDetailPage({
         <p className="text-sm text-text-secondary">
           <Link
             href="/bots"
-            className="font-medium text-accent hover:text-accent-dark focus:outline-none focus:ring-1 focus:ring-accent"
+            className="font-medium text-accent hover:text-accent-dark focus:outline-none focus-visible:ring-1 focus-visible:ring-accent"
           >
             Bots
           </Link>
@@ -115,7 +116,7 @@ export default async function BotDetailPage({
       <p className="text-sm text-text-secondary">
         <Link
           href="/bots"
-          className="font-medium text-accent hover:text-accent-dark focus:outline-none focus:ring-1 focus:ring-accent"
+          className="font-medium text-accent hover:text-accent-dark focus:outline-none focus-visible:ring-1 focus-visible:ring-accent"
         >
           Bots
         </Link>
@@ -125,25 +126,16 @@ export default async function BotDetailPage({
         {bot.name}
       </h1>
       <p className="mt-3 text-base leading-relaxed text-text-secondary">
-        Upload knowledge for this bot. Files stay pending until indexing runs.
+        Edit how this bot greets people, then upload PDF, Markdown, or text.
+        Files are indexed automatically after upload.
       </p>
 
-      <dl className="mt-8 space-y-5">
-        <div>
-          <dt className="text-sm font-medium text-text-primary">
-            Welcome message
-          </dt>
-          <dd className="mt-1 text-base leading-relaxed text-text-secondary whitespace-pre-wrap">
-            {bot.welcome_message || "—"}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-sm font-medium text-text-primary">System prompt</dt>
-          <dd className="mt-1 text-base leading-relaxed text-text-secondary whitespace-pre-wrap">
-            {bot.system_prompt || "—"}
-          </dd>
-        </div>
-      </dl>
+      <EditBotForm
+        botId={bot.id}
+        name={bot.name}
+        welcomeMessage={bot.welcome_message}
+        systemPrompt={bot.system_prompt}
+      />
 
       <section className="mt-10">
         <DocumentUpload

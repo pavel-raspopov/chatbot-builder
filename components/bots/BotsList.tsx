@@ -41,7 +41,15 @@ export function BotsList({
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const isEmpty = bots.length === 0;
 
-  function handleDelete(botId: string): void {
+  function handleDelete(botId: string, name: string): void {
+    if (
+      !window.confirm(
+        `Delete “${name}”? This also removes its documents and indexed knowledge.`,
+      )
+    ) {
+      return;
+    }
+
     setError(null);
     setDeletingId(botId);
     startTransition(async () => {
@@ -117,7 +125,7 @@ export function BotsList({
                 <div className="min-w-0">
                   <Link
                     href={`/bots/${bot.id}`}
-                    className="font-medium text-text-primary hover:text-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                    className="font-medium text-text-primary hover:text-accent focus:outline-none focus-visible:ring-1 focus-visible:ring-accent"
                   >
                     {bot.name}
                   </Link>
@@ -131,7 +139,7 @@ export function BotsList({
                   type="button"
                   variant="secondary"
                   disabled={isPending}
-                  onClick={() => handleDelete(bot.id)}
+                  onClick={() => handleDelete(bot.id, bot.name)}
                 >
                   {deleting ? "Deleting…" : "Delete"}
                 </Button>
@@ -146,7 +154,7 @@ export function BotsList({
           You&apos;ve reached your bot limit.{" "}
           <Link
             href="/settings/billing"
-            className="font-medium text-accent hover:text-accent-dark focus:outline-none focus:ring-1 focus:ring-accent"
+            className="font-medium text-accent hover:text-accent-dark focus:outline-none focus-visible:ring-1 focus-visible:ring-accent"
           >
             Upgrade
           </Link>{" "}

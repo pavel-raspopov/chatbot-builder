@@ -10,7 +10,7 @@ export function LandingFooter({
 }: LandingFooterProps): ReactNode {
   return (
     <footer className="border-t border-border bg-surface">
-      <div className="mx-auto flex max-w-[1120px] flex-col gap-6 px-6 py-10 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mx-auto flex w-full min-w-0 max-w-[1120px] flex-col gap-6 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <p className="font-display text-lg font-semibold text-text-primary">
           DocuChat
         </p>
@@ -20,19 +20,19 @@ export function LandingFooter({
         >
           <a
             href="#features"
-            className="hover:text-accent focus:outline-none focus:ring-1 focus:ring-accent"
+            className="hover:text-accent focus:outline-none focus-visible:ring-1 focus-visible:ring-accent"
           >
             Features
           </a>
           <a
             href="#pricing"
-            className="hover:text-accent focus:outline-none focus:ring-1 focus:ring-accent"
+            className="hover:text-accent focus:outline-none focus-visible:ring-1 focus-visible:ring-accent"
           >
             Pricing
           </a>
           <Link
             href={isAuthenticated ? "/dashboard" : "/login"}
-            className="hover:text-accent focus:outline-none focus:ring-1 focus:ring-accent"
+            className="hover:text-accent focus:outline-none focus-visible:ring-1 focus-visible:ring-accent"
           >
             {isAuthenticated ? "Dashboard" : "Log in"}
           </Link>

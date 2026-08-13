@@ -38,7 +38,8 @@ Note: Baseline established from the first real UI (`/impeccable document` scan +
 | Text primary | `text-text-primary` |
 | Text secondary | `text-text-secondary` |
 | Text muted | `text-text-muted` |
-| Focus ring | `focus:outline-none focus:ring-1 focus:ring-accent` |
+| Focus ring (fields) | `focus:outline-none focus:ring-1 focus:ring-accent` |
+| Focus ring (links / buttons) | `focus:outline-none focus-visible:ring-1 focus-visible:ring-accent` |
 | Marketing max width | `max-w-[1120px] px-6` |
 | Marketing header height | `h-16` |
 | App max width | `max-w-[1440px] px-6 sm:px-8` |
@@ -69,7 +70,7 @@ Last updated: 2026-08-11
 | Secondary border | `border border-border` |
 | Secondary text | `text-text-primary` |
 | Secondary hover | `hover:bg-surface-secondary` |
-| Focus | `focus:outline-none focus:ring-1 focus:ring-accent` |
+| Focus | `focus:outline-none focus-visible:ring-1 focus-visible:ring-accent` |
 | Transition | `transition-colors` |
 
 **Pattern notes:**  
@@ -268,17 +269,17 @@ Last updated: 2026-08-12
 | Meter track | `h-1.5 rounded-sm bg-surface-secondary` |
 | Meter fill | `bg-accent` (at limit: `bg-warning` + `text-warning` on count) |
 | Empty title | `font-display text-xl font-semibold tracking-tight text-text-primary` |
-| Actions | primary `Button` Create bot → `/bots/new`; secondary Upgrade → `/settings/billing` when Free or at limit |
+| Actions | at bot limit: primary Upgrade → `/settings/billing`; otherwise primary Create bot → `/bots/new` and optional secondary Upgrade |
 | Errors | `text-error` + `role="alert"` on page loader |
 | Shadow | none |
 
 **Pattern notes:**  
-Server page fetches `profiles` + `bots` count under RLS; presentational overview only. No metric cards — typography + thin meters. Create bot goes to `/bots/new`.
+Server page fetches `profiles` + `bots` count under RLS; presentational overview only. Meters use shared `UsageMeter`. At bot limit the primary CTA is Upgrade.
 
 ### AppNavbar
 
 File: `components/layout/AppNavbar.tsx`  
-Last updated: 2026-08-11
+Last updated: 2026-08-13
 
 | Property | Class |
 | --- | --- |
@@ -288,12 +289,12 @@ Last updated: 2026-08-11
 | Brand text | `font-display text-xl font-semibold tracking-tight text-text-primary` |
 | Nav link inactive | `text-sm font-medium text-text-secondary hover:text-accent` |
 | Nav link active | `text-sm font-medium text-accent` |
-| Focus | `focus:outline-none focus:ring-1 focus:ring-accent` |
+| Focus | `focus:outline-none focus-visible:ring-1 focus-visible:ring-accent` |
 | Sign out | secondary `Button` in Server Action form |
-| Narrow screens | Bots + Billing `hidden sm:inline`; Dashboard + Sign out always visible |
+| Narrow screens | Brand + Sign out on the first row; Dashboard / Bots / Billing wrap below. `px-4` until `sm`. |
 
 **Pattern notes:**  
-Client component for `usePathname`. Active: color only (no underline). Brand links to `/dashboard`. Billing matches `/settings/*`.
+Client component for `usePathname`. Active: color only (no underline). Brand links to `/dashboard`. Billing matches `/settings/*`. Do not keep all nav items in one unwrapping row — that overflows below ~400px.
 
 ### AppFooter
 
@@ -379,7 +380,7 @@ Last updated: 2026-08-12
 ### Bot detail
 
 File: `app/(app)/bots/[id]/page.tsx`  
-Last updated: 2026-08-12
+Last updated: 2026-08-13
 
 | Property | Class |
 | --- | --- |
@@ -388,15 +389,63 @@ Last updated: 2026-08-12
 | Title | `font-display text-3xl font-semibold tracking-tight text-text-primary` |
 | Body | `text-base leading-relaxed text-text-secondary` |
 | Field labels | `text-sm font-medium text-text-primary`; values `whitespace-pre-wrap` |
-| Documents section | `mt-10`; upload + list below read-only bot fields |
+| Documents section | `mt-10`; upload + list below `EditBotForm` |
 
 **Pattern notes:**  
-Own-bot RLS filter on load. Documents: `pending` → auto-ingest → `processing` / `ready` / `failed` (see 08).
+Own-bot RLS filter on load. Settings are editable (`EditBotForm`). Documents: upload auto-ingests; Retry on pending / processing / failed.
+
+### Edit bot form
+
+File: `components/bots/EditBotForm.tsx`  
+Last updated: 2026-08-13
+
+| Property | Class |
+| --- | --- |
+| Form | `mt-8 flex flex-col gap-4` (same as create / auth) |
+| Fields | `Input` name; `Textarea` welcome + system prompt |
+| Errors | `text-sm text-error` + `role="alert"` |
+| Success | `text-sm text-text-secondary` + `role="status"` |
+| Actions | primary submit “Save settings” |
+
+**Pattern notes:**  
+`useActionState` + `updateBot`. Hidden `bot_id`. Same field chrome as create.
+
+### Usage meter
+
+File: `components/ui/UsageMeter.tsx`  
+Last updated: 2026-08-13
+
+| Property | Class |
+| --- | --- |
+| Label | `text-sm font-medium text-text-primary` |
+| Count | `text-sm tabular-nums text-text-secondary` (at limit: `text-warning`) |
+| Track | `h-1.5 rounded-sm bg-surface-secondary` |
+| Fill | `bg-accent` (at limit: `bg-warning`) |
+
+**Pattern notes:**  
+Shared by dashboard and billing. Fill width is a single inline `style` percent — tokens cannot express a runtime percentage.
+
+### Billing
+
+File: `app/(app)/settings/billing/page.tsx`  
+Last updated: 2026-08-13
+
+| Property | Class |
+| --- | --- |
+| Layout | `max-w-2xl` |
+| Title | `font-display text-3xl font-semibold tracking-tight text-text-primary` |
+| Plan badge | `rounded-md bg-accent-muted px-2.5 py-1 text-xs font-medium text-accent` |
+| Body | `text-base leading-relaxed text-text-secondary` |
+| Meters | shared `UsageMeter` (bots, messages, storage) |
+| Actions | secondary Back to dashboard |
+
+**Pattern notes:**  
+Shows current plan and usage. No Stripe Checkout yet — copy says checkout ships in the billing phase.
 
 ### Document upload
 
 File: `components/bots/DocumentUpload.tsx`  
-Last updated: 2026-08-12
+Last updated: 2026-08-13
 
 | Property | Class |
 | --- | --- |
@@ -406,18 +455,18 @@ Last updated: 2026-08-12
 | Text — primary | Section `font-display text-xl font-semibold tracking-tight text-text-primary`; dropzone title `text-sm font-medium text-text-primary` |
 | Text — secondary | Quota / help `text-sm text-text-secondary` |
 | Spacing | Header gap `gap-2`; dropzone `px-4 py-8`; errors `mt-3` |
-| Hover / focus | Links `hover:text-accent-dark focus:ring-1 focus:ring-accent`; Choose file = secondary Button |
+| Hover / focus | Links `hover:text-accent-dark focus-visible:ring-1 focus-visible:ring-accent`; Choose file is a non-interactive span inside the label |
 | Shadow | none |
 | Accent usage | Drag state + upgrade links `text-accent` → `/settings/billing` |
 | Errors | `text-sm text-error` + `role="alert"` |
 
 **Pattern notes:**  
-Server Action `createDocument` (quota + pending row) then browser Storage upload; on Storage failure call `deleteDocument`. After upload succeeds, client POSTs `/api/ingest` (phases: Uploading… → Indexing…). Accept `.pdf,.md,.txt`. Client must use static `NEXT_PUBLIC_*` env reads (`lib/supabase/env.ts`).
+Dropzone is a `<label htmlFor>` around the file input (no nested button). Inner text/span use `pointer-events-none` so drag accent (`bg-accent-muted`) stays over the center. Server Action `createDocument` then browser Storage upload; on Storage failure call `deleteDocument`. After upload succeeds, client POSTs `/api/ingest`. Accept `.pdf,.md,.txt`.
 
 ### Documents list
 
 File: `components/bots/DocumentsList.tsx`  
-Last updated: 2026-08-12
+Last updated: 2026-08-13
 
 | Property | Class |
 | --- | --- |
@@ -433,7 +482,7 @@ Last updated: 2026-08-12
 | Errors | `text-sm text-error` + `role="alert"`; failed doc error under meta |
 
 **Pattern notes:**  
-Same divider-list pattern as Bots list. Status labels via `formatDocumentStatus`. Failed / stuck Processing rows show **Retry** (`POST /api/ingest`). `deleteDocument` removes Storage object + row (chunks cascade); `router.refresh()`.
+Same divider-list pattern as Bots list. Status labels via `formatDocumentStatus`. Pending / processing / failed rows show **Retry** (`force: true`). Delete uses `window.confirm`. `deleteDocument` removes Storage object + row.
 
 ---
 
@@ -451,12 +500,12 @@ Primary / secondary patterns in the Button entry. Do not invent a third button r
 
 ## Focus State Standard
 
-Interactive controls: `focus:outline-none focus:ring-1 focus:ring-accent`.
+Text fields: `focus:outline-none focus:ring-1 focus:ring-accent`. Links and buttons: `focus-visible:ring-1 focus-visible:ring-accent` so a mouse click does not leave a ring.
 
 ## Layout Standard
 
 - Marketing: `max-w-[1120px] px-6`, header `h-16`, sections `py-20 sm:py-24`
-- App: `max-w-[1440px]`, padding `px-6 py-8 sm:px-8`, top nav only
+- App: `max-w-[1440px]`, padding `px-4 py-8 sm:px-8`, top nav only; `overflow-x-hidden` on `body`; usable from 300px
 
 ## Motion Standard
 

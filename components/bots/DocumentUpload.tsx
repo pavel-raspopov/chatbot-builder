@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   useId,
-  useRef,
   useState,
   useTransition,
   type ChangeEvent,
@@ -12,7 +11,6 @@ import {
   type ReactNode,
 } from "react";
 import { createDocument, deleteDocument } from "@/actions/documents";
-import { Button } from "@/components/ui/Button";
 import {
   formatBytes,
   getDocumentAcceptAttribute,
@@ -34,7 +32,6 @@ export function DocumentUpload({
 }: DocumentUploadProps): ReactNode {
   const router = useRouter();
   const inputId = useId();
-  const inputRef = useRef<HTMLInputElement>(null);
   const [isPending, startTransition] = useTransition();
   const [phase, setPhase] = useState<"idle" | "uploading" | "indexing">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -124,7 +121,7 @@ export function DocumentUpload({
     }
   }
 
-  function onDrop(event: DragEvent<HTMLDivElement>): void {
+  function onDrop(event: DragEvent<HTMLLabelElement>): void {
     event.preventDefault();
     setIsDragging(false);
     if (busy || atQuota) {
@@ -152,7 +149,7 @@ export function DocumentUpload({
           You&apos;ve reached your storage limit.{" "}
           <Link
             href="/settings/billing"
-            className="font-medium text-accent hover:text-accent-dark focus:outline-none focus:ring-1 focus:ring-accent"
+            className="font-medium text-accent hover:text-accent-dark focus:outline-none focus-visible:ring-1 focus-visible:ring-accent"
           >
             Upgrade
           </Link>{" "}
@@ -165,20 +162,10 @@ export function DocumentUpload({
         </p>
       )}
 
-      <div
-        role="button"
-        tabIndex={atQuota || busy ? -1 : 0}
+      <label
+        htmlFor={inputId}
         aria-disabled={atQuota || busy}
         aria-describedby={error ? `${inputId}-error` : undefined}
-        onKeyDown={(event) => {
-          if (atQuota || busy) {
-            return;
-          }
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            inputRef.current?.click();
-          }
-        }}
         onDragEnter={(event) => {
           event.preventDefault();
           if (!atQuota && !busy) {
@@ -190,45 +177,33 @@ export function DocumentUpload({
         }}
         onDragLeave={(event) => {
           event.preventDefault();
+          const next = event.relatedTarget;
+          if (next instanceof Node && event.currentTarget.contains(next)) {
+            return;
+          }
           setIsDragging(false);
         }}
         onDrop={onDrop}
-        onClick={() => {
-          if (!atQuota && !busy) {
-            inputRef.current?.click();
-          }
-        }}
-        className={`mt-4 rounded-md border border-dashed px-4 py-8 text-center transition-colors ${
+        className={`mt-4 block rounded-md border border-dashed px-4 py-8 text-center transition-colors ${
           isDragging
             ? "border-accent bg-accent-muted"
             : "border-border bg-surface-secondary"
         } ${atQuota || busy ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
       >
-        <p className="text-sm font-medium text-text-primary">
+        <p className="pointer-events-none text-sm font-medium text-text-primary">
           {phase === "indexing"
             ? "Indexing…"
             : phase === "uploading" || isPending
               ? "Uploading…"
               : "Drop a file here, or choose one"}
         </p>
-        <p className="mt-1 text-sm text-text-secondary">
+        <p className="pointer-events-none mt-1 text-sm text-text-secondary">
           .pdf, .md, .txt · up to {formatBytes(remaining)} left on this plan
         </p>
-        <div className="mt-4">
-          <Button
-            type="button"
-            variant="secondary"
-            disabled={atQuota || busy}
-            onClick={(event) => {
-              event.stopPropagation();
-              inputRef.current?.click();
-            }}
-          >
-            Choose file
-          </Button>
-        </div>
+        <span className="pointer-events-none mt-4 inline-flex items-center justify-center rounded-md border border-border bg-surface px-4 py-2 text-sm font-medium text-text-primary">
+          Choose file
+        </span>
         <input
-          ref={inputRef}
           id={inputId}
           type="file"
           className="sr-only"
@@ -236,7 +211,7 @@ export function DocumentUpload({
           disabled={atQuota || busy}
           onChange={onInputChange}
         />
-      </div>
+      </label>
 
       {error ? (
         <p id={`${inputId}-error`} className="mt-3 text-sm text-error" role="alert">
@@ -246,7 +221,7 @@ export function DocumentUpload({
               {" "}
               <Link
                 href="/settings/billing"
-                className="font-medium text-accent hover:text-accent-dark focus:outline-none focus:ring-1 focus:ring-accent"
+                className="font-medium text-accent hover:text-accent-dark focus:outline-none focus-visible:ring-1 focus-visible:ring-accent"
               >
                 Go to billing
               </Link>

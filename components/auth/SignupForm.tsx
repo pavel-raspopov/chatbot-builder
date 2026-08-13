@@ -50,7 +50,7 @@ export function SignupForm(): ReactNode {
         Already have an account?{" "}
         <Link
           href="/login"
-          className="font-medium text-accent hover:text-accent-dark focus:outline-none focus:ring-1 focus:ring-accent"
+          className="font-medium text-accent hover:text-accent-dark focus:outline-none focus-visible:ring-1 focus-visible:ring-accent"
         >
           Log in
         </Link>

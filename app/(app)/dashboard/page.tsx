@@ -93,6 +93,7 @@ export default async function DashboardPage(): Promise<ReactNode> {
       maxBots={limits.maxBots}
       messagesUsed={messagesUsed}
       maxMessages={limits.maxMessagesPerMonth}
+      atBotLimit={atBotLimit}
       showUpgrade={showUpgrade}
     />
   );

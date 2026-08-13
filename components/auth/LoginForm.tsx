@@ -50,7 +50,7 @@ export function LoginForm({ nextPath }: LoginFormProps): ReactNode {
         New here?{" "}
         <Link
           href="/signup"
-          className="font-medium text-accent hover:text-accent-dark focus:outline-none focus:ring-1 focus:ring-accent"
+          className="font-medium text-accent hover:text-accent-dark focus:outline-none focus-visible:ring-1 focus-visible:ring-accent"
         >
           Start free
         </Link>
