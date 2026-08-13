@@ -130,6 +130,10 @@ export default async function BotDetailPage({
         Files are indexed automatically after upload.
       </p>
 
+      <div className="mt-6">
+        <Button href={`/bots/${bot.id}/chat`}>Open chat</Button>
+      </div>
+
       <EditBotForm
         botId={bot.id}
         name={bot.name}

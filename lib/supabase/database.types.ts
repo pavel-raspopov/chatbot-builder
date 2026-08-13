@@ -263,6 +263,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      consume_message_quota: {
+        Args: {
+          p_max: number
+        }
+        Returns: {
+          allowed: boolean
+          month_limit: number
+          used: number
+        }[]
+      }
       match_chunks: {
         Args: {
           p_bot_id: string

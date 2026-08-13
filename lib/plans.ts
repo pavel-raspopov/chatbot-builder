@@ -1,4 +1,4 @@
-export type PlanId = "free" | "pro" | "business";
+export type PlanId = 'free' | 'pro' | 'business';
 
 export type Plan = {
   id: PlanId;
@@ -39,52 +39,52 @@ export const planLimits: Record<PlanId, PlanLimits> = {
 
 export const plans: Plan[] = [
   {
-    id: "free",
-    name: "Free",
-    priceLabel: "$0",
-    priceNote: "Forever free to try",
+    id: 'free',
+    name: 'Free',
+    priceLabel: '$0',
+    priceNote: 'Forever free to try',
     highlighted: false,
     features: [
-      "1 bot",
-      "100 messages / month",
-      "10 MB doc storage",
-      "Widget shows DocuChat badge",
+      '1 bot',
+      '100 messages / month',
+      '10 MB doc storage',
+      'Widget shows DocuChat badge',
     ],
-    ctaLabel: "Start free",
+    ctaLabel: 'Start free',
   },
   {
-    id: "pro",
-    name: "Pro",
-    priceLabel: "$29",
-    priceNote: "per month · Stripe test mode",
+    id: 'pro',
+    name: 'Pro',
+    priceLabel: '$29',
+    priceNote: 'per month · Stripe test mode',
     highlighted: true,
     features: [
-      "5 bots",
-      "2,000 messages / month",
-      "200 MB doc storage",
-      "Remove widget branding",
+      '5 bots',
+      '2,000 messages / month',
+      '200 MB doc storage',
+      'Remove widget branding',
     ],
-    ctaLabel: "Start with Pro",
+    ctaLabel: 'Start with Pro',
   },
   {
-    id: "business",
-    name: "Business",
-    priceLabel: "$99",
-    priceNote: "per month · Stripe test mode",
+    id: 'business',
+    name: 'Business',
+    priceLabel: '$99',
+    priceNote: 'per month · Stripe test mode',
     highlighted: false,
     features: [
-      "20 bots",
-      "10,000 messages / month",
-      "1 GB doc storage",
-      "Remove widget branding",
-      "Higher rate limits",
+      '20 bots',
+      '10,000 messages / month',
+      '1 GB doc storage',
+      'Remove widget branding',
+      'Higher rate limits',
     ],
-    ctaLabel: "Start with Business",
+    ctaLabel: 'Start with Business',
   },
 ];
 
 function isPlanId(value: string): value is PlanId {
-  return value === "free" || value === "pro" || value === "business";
+  return value === 'free' || value === 'pro' || value === 'business';
 }
 
 /** Resolve a plan id string; unknown values fall back to free. */
@@ -92,7 +92,7 @@ export function normalizePlanId(value: string | null | undefined): PlanId {
   if (value && isPlanId(value)) {
     return value;
   }
-  return "free";
+  return 'free';
 }
 
 export function getPlan(id: string | null | undefined): Plan {

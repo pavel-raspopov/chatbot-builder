@@ -2,6 +2,8 @@ import { GoogleGenAI } from "@google/genai";
 
 export const EMBEDDING_MODEL = "gemini-embedding-001";
 export const EMBEDDING_DIMENSIONS = 768;
+export const CHAT_MODEL = "gemini-3.6-flash";
+const CHAT_MAX_OUTPUT_TOKENS = 1024;
 
 const EMBED_BATCH_SIZE = 20;
 
@@ -73,4 +75,30 @@ export async function embedTexts(
 /** Format a float vector for pgvector / PostgREST. */
 export function formatEmbeddingForDb(values: number[]): string {
   return `[${values.join(",")}]`;
+}
+
+/** Stream a grounded chat completion as text deltas. */
+export async function* streamChatCompletion(params: {
+  systemInstruction: string;
+  userMessage: string;
+}): AsyncGenerator<string> {
+  const ai = getGeminiClient();
+  const stream = await ai.models.generateContentStream({
+    model: CHAT_MODEL,
+    contents: params.userMessage,
+    config: {
+      systemInstruction: params.systemInstruction,
+      maxOutputTokens: CHAT_MAX_OUTPUT_TOKENS,
+      thinkingConfig: {
+        thinkingLevel: "minimal",
+      },
+    },
+  });
+
+  for await (const chunk of stream) {
+    const text = chunk.text;
+    if (text) {
+      yield text;
+    }
+  }
 }

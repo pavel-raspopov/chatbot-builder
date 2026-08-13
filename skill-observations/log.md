@@ -40,3 +40,18 @@ resolved statuses always carry their resolution date
 
 **Principle:** A missing API call in source is not proof of a user-visible bug — confirm with the official storage/delete docs and the path the user actually ran before proposing cleanup machinery.
 
+
+### Observation 5: Plan-specified verification vs TDD skill when the repo has no test runner
+
+**Status:** OPEN
+**Date:** 2026-08-13
+**Session context:** Implementing 09 in-app chat from an approved plan that named lint, build, and manual UI as verification
+**Skill:** test-driven-development
+**Type:** open-source
+**Phase/Area:** When to Use / Iron Law vs user-plan precedence
+
+**Issue:** The TDD skill requires a failing test before production code. This repo has no test runner, and the written feature plan explicitly forbade adding one. Following TDD would have expanded scope (install Vitest/Jest) against the plan.
+
+**Suggested improvement:** Add an exception: when the project or the current plan names a verification method and there is no test runner, do not add a framework unasked. Follow the plan's verify commands. User instructions and the written plan outrank the TDD iron law.
+
+**Principle:** A skill that mandates tests cannot override a project that has no test runner and a plan that already specified how to verify.

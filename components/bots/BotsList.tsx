@@ -135,14 +135,19 @@ export function BotsList({
                     </p>
                   ) : null}
                 </div>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  disabled={isPending}
-                  onClick={() => handleDelete(bot.id, bot.name)}
-                >
-                  {deleting ? "Deleting…" : "Delete"}
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button href={`/bots/${bot.id}/chat`} variant="secondary">
+                    Chat
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    disabled={isPending}
+                    onClick={() => handleDelete(bot.id, bot.name)}
+                  >
+                    {deleting ? "Deleting…" : "Delete"}
+                  </Button>
+                </div>
               </li>
             );
           })}

@@ -52,7 +52,7 @@ MCP (when relevant) → Skills via AGENTS.md → This file (project rules) → G
 | `lib/supabase/proxy.ts` | `updateSession` used by root `proxy.ts` — refresh + route gates |
 | `lib/supabase/env.ts` | Shared URL / public key helpers |
 | `lib/supabase/database.types.ts` | Generated `Database` types (regenerate after schema changes) |
-| `lib/supabase/admin.ts` | Server-only service role — add when widget / Stripe webhook need elevated writes (ingest 08 uses user session + RLS) |
+| `lib/supabase/admin.ts` | Server-only service role — `createAdminClient()`. For Stripe webhooks / widget later. In-app chat quota uses `consume_message_quota` RPC (user JWT), not this client.
 
 ### Schema / migrations
 
@@ -60,6 +60,7 @@ MCP (when relevant) → Skills via AGENTS.md → This file (project rules) → G
 - Apply to the linked remote project with Supabase MCP `apply_migration` (name in snake_case); keep repo SQL in sync.
 - `vector` lives in schema `extensions`; `chunks.embedding` is `vector(768)` with **HNSW** (`vector_cosine_ops`).
 - RPC: `match_chunks(p_bot_id, p_query_embedding, p_match_count)` — `SECURITY INVOKER` so RLS applies; service role bypasses RLS for widget later.
+- RPC: `consume_message_quota(p_max)` — `SECURITY DEFINER`, scoped to `auth.uid()`; authenticated cannot UPDATE profile quota columns directly. Plan caps stay in `lib/plans.ts`.
 - Profiles: `handle_new_user` trigger on `auth.users`; `EXECUTE` revoked from `anon`/`authenticated` (trigger-only).
 - Storage bucket `documents` is private; object path first folder = `auth.uid()`.
 - Documents: authenticated `UPDATE` is column-limited to `status` and `error` (`protect_documents_quota_columns`). Delete files with `storage.remove` (not SQL) before or with the row delete — `deleteDocument` and `deleteBot` both do this.
@@ -99,7 +100,7 @@ MCP (when relevant) → Skills via AGENTS.md → This file (project rules) → G
 | Use | Model | Notes |
 | --- | --- | --- |
 | Embeddings | `gemini-embedding-001` | Set `output_dimensionality: 768`; store as `vector(768)` in Postgres |
-| Chat | `gemini-2.5-flash` | In-app + widget answers; stream when the UI supports it |
+| Chat | `gemini-3.6-flash` | In-app + widget answers; stream when the UI supports it. Replaces retired `gemini-2.5-flash` for new API keys. |
 
 ### Rules
 
@@ -117,7 +118,9 @@ import { GoogleGenAI } from "@google/genai";
 export const gemini = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 ```
 
-Use `embedTexts()` in `lib/gemini.ts` for ingest (`taskType: RETRIEVAL_DOCUMENT`, `outputDimensionality: 768`). Store vectors as `[…]` strings for PostgREST/`vector(768)`.
+Use `embedTexts()` in `lib/gemini.ts` for ingest (`taskType: RETRIEVAL_DOCUMENT`) and chat retrieval (`RETRIEVAL_QUERY`). Store vectors as `[…]` strings for PostgREST/`vector(768)`.
+
+Chat completions: `streamChatCompletion()` (`gemini-3.6-flash`, `maxOutputTokens: 1024`). Do not set `temperature` (deprecated on Gemini 3.x). Set `thinkingConfig.thinkingLevel` to `minimal` so RAG answers do not spend 10–50s in default medium thinking before the first token. Retrieval: `lib/rag/retrieve.ts` → `match_chunks` (k=8, similarity floor 0.25). Grounded stream: `lib/rag/answer.ts`. In-app route: authenticated `POST /api/chat` (SSE). Empty retrieval returns “I don’t know from your docs” without calling Gemini. Message quota: `lib/usage.ts` → `consume_message_quota` RPC before the stream.
 
 ---
 

@@ -9,7 +9,7 @@
 | Database | Supabase Postgres + RLS | App data |
 | Vectors | pgvector | Chunk embeddings + similarity search |
 | Storage | Supabase Storage | Uploaded docs |
-| AI | Google Gemini API | `gemini-embedding-001` (768-d) + `gemini-2.5-flash` |
+| AI | Google Gemini API | `gemini-embedding-001` (768-d) + `gemini-3.6-flash` |
 | Billing | Stripe test mode | Checkout + webhooks → plan |
 | Styling | Tailwind + design tokens | UI |
 | Language | TypeScript strict | Throughout |
@@ -179,8 +179,8 @@ flowchart LR
 ```
 
 1. **Ingest** (`/api/ingest` or background after upload): parse PDF/text → chunk (~500–800 tokens, overlap) → embed → insert `chunks`; set document `ready` / `failed`.
-2. **Retrieve**: embed question → `match_chunks(bot_id, query_embedding, k)` RPC → top-k texts.
-3. **Generate**: system prompt + retrieved context + user message → chat completion. Prefer streaming for in-app UI.
+2. **Retrieve**: `lib/rag/retrieve.ts` embeds the question (`RETRIEVAL_QUERY`) → `match_chunks` RPC (k=8, similarity floor 0.25).
+3. **Generate**: `lib/rag/answer.ts` + `streamChatCompletion()` (`gemini-3.6-flash`). Empty retrieval skips Gemini and returns “I don’t know from your docs.” In-app: authenticated `POST /api/chat` SSE; quota via `consume_message_quota` RPC (`lib/usage.ts`).
 
 ---
 

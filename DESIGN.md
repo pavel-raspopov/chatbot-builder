@@ -256,6 +256,8 @@ Centered column (`max-w-md` auth): Literata brand in `text-accent`, page title L
 
 - Stacked bubbles; user on `bg-accent-muted`; assistant on `bg-surface-secondary` + border — not rainbow accents
 - Composer row: bordered surface field + accent send control
+- Live thread: `/bots/[id]/chat` — `ChatThread` panel `rounded-lg border-border shadow-card`, sticky composer, empty-docs state, `focus-visible` on links/send
+- Waiting: three muted bouncing dots (`ChatThinkingDots`) until the first token; honor `prefers-reduced-motion`
 
 ### Pricing
 

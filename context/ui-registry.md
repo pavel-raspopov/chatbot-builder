@@ -134,7 +134,7 @@ Last updated: 2026-08-11
 | Motion | `animate-hero-mock` |
 
 **Pattern notes:**  
-Decorative (`aria-hidden`). Chat bubble contrast uses surface tones — never rainbow accents. Future real chat UI should match these bubble tokens.
+Decorative (`aria-hidden`). Chat bubble contrast uses surface tones — never rainbow accents. Live in-app chat (`ChatMessage` / `ChatThread`) matches these bubble tokens.
 
 ---
 
@@ -346,7 +346,7 @@ Same chrome as `Input`. Prefer shared `Textarea` for multi-line fields (welcome 
 ### Bots list
 
 File: `components/bots/BotsList.tsx` (loaded by `app/(app)/bots/page.tsx`)  
-Last updated: 2026-08-12
+Last updated: 2026-08-13
 
 | Property | Class |
 | --- | --- |
@@ -354,9 +354,9 @@ Last updated: 2026-08-12
 | Title | `font-display text-3xl font-semibold tracking-tight text-text-primary` |
 | Meta | `text-base leading-relaxed text-text-secondary` (`n / max` bots) |
 | List | `divide-y divide-border border-y border-border`; rows `py-4` |
-| Bot name link | `font-medium text-text-primary hover:text-accent focus:ring-1 focus:ring-accent` |
+| Bot name link | `font-medium text-text-primary hover:text-accent focus-visible:ring-1 focus-visible:ring-accent` |
 | Empty title | `font-display text-xl font-semibold tracking-tight text-text-primary` |
-| Actions | Create → `/bots/new`; at limit Upgrade → `/settings/billing`; Delete secondary `Button` |
+| Actions | Chat → `/bots/[id]/chat` (secondary); Create → `/bots/new`; at limit Upgrade → `/settings/billing`; Delete secondary `Button` |
 | Errors | `text-sm text-error` + `role="alert"` |
 
 **Pattern notes:**  
@@ -388,11 +388,12 @@ Last updated: 2026-08-13
 | Breadcrumb | `text-sm`; link `text-accent` |
 | Title | `font-display text-3xl font-semibold tracking-tight text-text-primary` |
 | Body | `text-base leading-relaxed text-text-secondary` |
+| Primary CTA | `Open chat` → `/bots/[id]/chat` |
 | Field labels | `text-sm font-medium text-text-primary`; values `whitespace-pre-wrap` |
 | Documents section | `mt-10`; upload + list below `EditBotForm` |
 
 **Pattern notes:**  
-Own-bot RLS filter on load. Settings are editable (`EditBotForm`). Documents: upload auto-ingests; Retry on pending / processing / failed.
+Own-bot RLS filter on load. Settings are editable (`EditBotForm`). Documents: upload auto-ingests; Retry on pending / processing / failed. Primary path into chat is **Open chat**.
 
 ### Edit bot form
 
@@ -483,6 +484,75 @@ Last updated: 2026-08-13
 
 **Pattern notes:**  
 Same divider-list pattern as Bots list. Status labels via `formatDocumentStatus`. Pending / processing / failed rows show **Retry** (`force: true`). Delete uses `window.confirm`. `deleteDocument` removes Storage object + row.
+
+### Chat thread
+
+File: `components/chat/ChatThread.tsx` (page `app/(app)/bots/[id]/chat/page.tsx`)  
+Last updated: 2026-08-13
+
+| Property | Class |
+| --- | --- |
+| Layout | Column `max-w-[720px]`; panel fills remaining viewport `min-h-[calc(100dvh-14rem)]` |
+| Panel | `rounded-lg border border-border bg-surface shadow-card` |
+| Header | `bg-surface-secondary` + `border-b border-border`; caption `text-xs font-medium text-text-muted` |
+| Title | `font-display text-3xl font-semibold tracking-tight text-text-primary` |
+| Body | `text-base leading-relaxed text-text-secondary` |
+| Breadcrumb | `text-sm`; links `text-accent hover:text-accent-dark focus-visible:ring-1 focus-visible:ring-accent` |
+| Empty title | `font-display text-xl font-semibold tracking-tight text-text-primary` |
+| Composer dock | `sticky bottom-0 border-t border-border bg-surface p-4 sm:p-5` |
+| Errors | `text-sm text-error` + `role="alert"`; 429 adds billing link `text-accent` |
+| Shadow | `shadow-card` on the panel |
+
+**Pattern notes:**  
+Operate chat, not a new visual world. Match `HeroChatMock` chrome. Composer disabled when the bot has no `ready` documents. Welcome bubble only when the stored thread is empty.
+
+### Chat message
+
+File: `components/chat/ChatMessage.tsx`  
+Last updated: 2026-08-13
+
+| Property | Class |
+| --- | --- |
+| User bubble | `ml-auto max-w-[85%] rounded-md bg-accent-muted px-3.5 py-2.5 text-sm leading-relaxed text-text-primary` |
+| Assistant bubble | `mr-auto max-w-[90%] rounded-md border border-border bg-surface-secondary px-3.5 py-2.5 text-sm leading-relaxed text-text-primary` |
+| Streaming | Three muted dots (`ChatThinkingDots`) while the assistant bubble is empty; honor `prefers-reduced-motion` |
+| Shadow | none |
+| Accent usage | user bubble fill `bg-accent-muted` only — no rainbow |
+
+**Pattern notes:**  
+Same tokens as the landing `HeroChatMock`. Do not add markdown rendering or citation chips in MVP. Waiting state is bouncing dots, not a caret.
+
+### Chat composer
+
+File: `components/chat/ChatComposer.tsx`  
+Last updated: 2026-08-13
+
+| Property | Class |
+| --- | --- |
+| Row | `flex items-end gap-2 rounded-md border border-border bg-surface px-3 py-2.5` |
+| Field | `bg-transparent text-sm leading-relaxed text-text-primary placeholder:text-text-muted`; `sr-only` label |
+| Send | primary `Button` `px-3 py-1.5 text-xs`; `disabled:opacity-60` |
+| Focus | textarea `focus:outline-none`; send uses `focus-visible` from Button |
+| Shadow | none |
+
+**Pattern notes:**  
+Enter sends; Shift+Enter newline. Not the labeled `Textarea` form control — this is the chat dock.
+
+### Chat thinking dots
+
+File: `components/chat/ChatThinkingDots.tsx`  
+Last updated: 2026-08-13
+
+| Property | Class |
+| --- | --- |
+| Layout | `inline-flex items-center gap-1` |
+| Dots | `size-1.5 rounded-full bg-text-muted` |
+| Motion | `.chat-thinking-dot` bounce in `app/globals.css`; delays 0 / 0.16s / 0.32s |
+| Reduced motion | animation none; `opacity: 0.7` |
+| A11y | `role="status"` `aria-label="Thinking"` |
+
+**Pattern notes:**  
+Shown in the assistant bubble only while streaming and content is empty. Token fill only — not accent.
 
 ---
 

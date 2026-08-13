@@ -6,9 +6,9 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ## Current Status
 
-**Phase:** Phase 2 — Bots + Knowledge
-**Last completed:** 08 Ingest / RAG indexing — extract → chunk → Gemini embed → `chunks`; auto after upload + Retry
-**Next:** 09 In-app chat UI
+**Phase:** Phase 3 — Chat
+**Last completed:** 09 In-app chat UI — `/bots/[id]/chat` + `POST /api/chat` (retrieve, Gemini stream, quota)
+**Next:** 10 Embed snippet + preview
 
 ---
 
@@ -30,7 +30,7 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ### Phase 3 — Chat
 
-- [ ] 09 In-app chat UI
+- [x] 09 In-app chat UI
 
 ### Phase 4 — Embed Widget
 
@@ -50,6 +50,7 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ## Notes
 
+- 2026-08-13 Phase 3: in-app chat at `/bots/[id]/chat`; shared `lib/rag/retrieve.ts` + `lib/rag/answer.ts`; `POST /api/chat` SSE; quota via `consume_message_quota` RPC (no service role on the in-app path); resume latest app conversation; no citation chips
 - 2026-08-13 Phase 2 hardening: bot settings edit, Storage API delete on bot remove, pending Retry, ingest 409 unless `force`, billing usage page (no Stripe yet), documents column lock (`status`/`error` only)
 - Source of truth for requirements: `context/project-brief.md`
 - Stack: Supabase + Gemini + Stripe test — never InsForge / OpenAI for chatbot
