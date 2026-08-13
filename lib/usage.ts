@@ -40,7 +40,7 @@ function isMissingRpc(error: { message?: string; code?: string }): boolean {
   const message = error.message ?? "";
   return (
     error.code === "PGRST202" ||
-    /consume_message_quota/i.test(message) ||
+    /consume_message_quota|consume_owner_message_quota/i.test(message) ||
     /could not find the function/i.test(message)
   );
 }
@@ -106,6 +106,73 @@ export async function consumeMessageQuota(
       ok: false,
       error:
         "You've reached your monthly message limit. Upgrade your plan to send more.",
+      statusCode: 429,
+    };
+  }
+
+  return { ok: true, used: row.used, limit: row.month_limit };
+}
+
+/**
+ * Same monthly counter as consumeMessageQuota, targeting a bot owner.
+ * Widget visitors have no JWT — call this with the service-role client only.
+ */
+export async function consumeOwnerMessageQuota(
+  supabase: AppSupabase,
+  ownerUserId: string,
+): Promise<ConsumeQuotaResult> {
+  const { data: profile, error: loadError } = await supabase
+    .from("profiles")
+    .select("plan")
+    .eq("id", ownerUserId)
+    .maybeSingle();
+
+  if (loadError || !profile) {
+    console.error("[lib/usage] owner load", loadError);
+    return {
+      ok: false,
+      error: "Could not check this bot’s message quota. Please try again.",
+      statusCode: 500,
+    };
+  }
+
+  const limit = getPlanLimits(normalizePlanId(profile.plan)).maxMessagesPerMonth;
+  const { data, error } = await supabase.rpc("consume_owner_message_quota", {
+    p_user_id: ownerUserId,
+    p_max: limit,
+  });
+
+  if (error) {
+    console.error("[lib/usage] consume_owner_message_quota", error);
+    if (isMissingRpc(error)) {
+      return {
+        ok: false,
+        error:
+          "Message quota is not configured on the database. Apply the latest migration and try again.",
+        statusCode: 500,
+      };
+    }
+    return {
+      ok: false,
+      error: "Could not check this bot’s message quota. Please try again.",
+      statusCode: 500,
+    };
+  }
+
+  const row = readQuotaRow(data);
+  if (!row) {
+    console.error("[lib/usage] unexpected owner rpc payload", data);
+    return {
+      ok: false,
+      error: "Could not check this bot’s message quota. Please try again.",
+      statusCode: 500,
+    };
+  }
+
+  if (!row.allowed) {
+    return {
+      ok: false,
+      error: "This bot has reached its monthly message limit.",
       statusCode: 429,
     };
   }

@@ -16,7 +16,7 @@ Ask a question against this bot’s indexed docs, see a streaming grounded answe
 
 ## Composition
 
-App shell. Breadcrumb Bots / name / Chat. Panel matching `HeroChatMock`: header caption, stacked bubbles, sticky composer. Empty-docs state links back to upload. No conversation sidebar.
+App shell. Breadcrumb Bots / name / Chat. Panel matching `HeroChatMock`: header caption, stacked bubbles, composer dock. Column is a fixed viewport slice (`h-[calc(100dvh-14rem)]`); long threads scroll inside the message list. Empty-docs state links back to upload. No conversation sidebar.
 
 ## Visual inheritance
 

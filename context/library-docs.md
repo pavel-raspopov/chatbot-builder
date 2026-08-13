@@ -52,15 +52,16 @@ MCP (when relevant) → Skills via AGENTS.md → This file (project rules) → G
 | `lib/supabase/proxy.ts` | `updateSession` used by root `proxy.ts` — refresh + route gates |
 | `lib/supabase/env.ts` | Shared URL / public key helpers |
 | `lib/supabase/database.types.ts` | Generated `Database` types (regenerate after schema changes) |
-| `lib/supabase/admin.ts` | Server-only service role — `createAdminClient()`. For Stripe webhooks / widget later. In-app chat quota uses `consume_message_quota` RPC (user JWT), not this client.
+| `lib/supabase/admin.ts` | Server-only service role — `createAdminClient()`. Widget chat (`POST /api/widget/chat`) and Stripe webhooks. In-app chat quota uses `consume_message_quota` RPC (user JWT), not this client.
 
 ### Schema / migrations
 
 - SQL under `supabase/migrations/` (CLI `supabase init` + `supabase migration new`).
 - Apply to the linked remote project with Supabase MCP `apply_migration` (name in snake_case); keep repo SQL in sync.
 - `vector` lives in schema `extensions`; `chunks.embedding` is `vector(768)` with **HNSW** (`vector_cosine_ops`).
-- RPC: `match_chunks(p_bot_id, p_query_embedding, p_match_count)` — `SECURITY INVOKER` so RLS applies; service role bypasses RLS for widget later.
+- RPC: `match_chunks(p_bot_id, p_query_embedding, p_match_count)` — `SECURITY INVOKER` so RLS applies; widget chat calls it with the service-role client (RLS bypassed).
 - RPC: `consume_message_quota(p_max)` — `SECURITY DEFINER`, scoped to `auth.uid()`; authenticated cannot UPDATE profile quota columns directly. Plan caps stay in `lib/plans.ts`.
+- RPC: `consume_owner_message_quota(p_user_id, p_max)` — `SECURITY DEFINER`, same month-reset logic for a bot owner. `EXECUTE` granted to `service_role` only (revoked from `anon`/`authenticated`). Used by widget chat via `consumeOwnerMessageQuota` in `lib/usage.ts`.
 - RPC: `get_bot_widget_config(p_public_id)` — `SECURITY DEFINER`, returns only `public_id`, `name`, `welcome_message`, `remove_branding` for the embed preview. `EXECUTE` granted to `anon` (intentional). Never returns `system_prompt` or `user_id`.
 - Profiles: `handle_new_user` trigger on `auth.users`; `EXECUTE` revoked from `anon`/`authenticated` (trigger-only).
 - Storage bucket `documents` is private; object path first folder = `auth.uid()`.
@@ -122,7 +123,7 @@ export const gemini = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 
 Use `embedTexts()` in `lib/gemini.ts` for ingest (`taskType: RETRIEVAL_DOCUMENT`) and chat retrieval (`RETRIEVAL_QUERY`). Store vectors as `[…]` strings for PostgREST/`vector(768)`.
 
-Chat completions: `streamChatCompletion()` (`gemini-3.6-flash`, `maxOutputTokens: 1024`). Do not set `temperature` (deprecated on Gemini 3.x). Set `thinkingConfig.thinkingLevel` to `ThinkingLevel.MINIMAL` (SDK enum; a `"minimal"` string fails the current types) so RAG answers do not spend 10–50s in default medium thinking before the first token. Retrieval: `lib/rag/retrieve.ts` → `match_chunks` (k=8, similarity floor 0.25). Grounded stream: `lib/rag/answer.ts`. In-app route: authenticated `POST /api/chat` (SSE). Empty retrieval returns “I don’t know from your docs” without calling Gemini. Message quota: `lib/usage.ts` → `consume_message_quota` RPC before the stream.
+Chat completions: `streamChatCompletion()` (`gemini-3.6-flash`, `maxOutputTokens: 1024`). Do not set `temperature` (deprecated on Gemini 3.x). Set `thinkingConfig.thinkingLevel` to `ThinkingLevel.MINIMAL` (SDK enum; a `"minimal"` string fails the current types) so RAG answers do not spend 10–50s in default medium thinking before the first token. Retrieval: `lib/rag/retrieve.ts` → `match_chunks` (k=8, similarity floor 0.25). Grounded stream: `lib/rag/answer.ts`. In-app route: authenticated `POST /api/chat` (SSE). Widget route: unauthenticated `POST /api/widget/chat` (SSE, CORS `*`, service role). Empty retrieval returns “I don’t know from your docs” without calling Gemini. Message quota: in-app `lib/usage.ts` → `consume_message_quota`; widget `consumeOwnerMessageQuota` → `consume_owner_message_quota` (owner’s monthly pool).
 
 ---
 
@@ -171,8 +172,8 @@ Defined also in `project-overview.md` / `PRODUCT.md`:
 
 - Ship `public/widget.js` (vanilla JS IIFE) — no React on customer sites.
 - Config via `data-bot` (`public_id`). Script origin comes from `script.src`.
-- Launcher injects a floating button + iframe to `/w/{public_id}/embed`.
-- The iframe panel is Next.js (tokens). Live chat API is feature 11 (`/api/widget/chat`).
+- Launcher injects a floating button + iframe to `/w/{public_id}/embed`. Chat runs inside the iframe (`POST /api/widget/chat`), not from `widget.js`.
+- Widget API: CORS `Access-Control-Allow-Origin: *`, OPTIONS preflight, in-memory IP+bot rate limit (20/min free/pro, 60/min business), owner monthly quota, SSE same event shape as in-app. Requires `SUPABASE_SERVICE_ROLE_KEY`. Conversations persist with `source=widget` and `user_id` null.
 - Show “Powered by DocuChat” unless `remove_branding` is true (toggle ships in billing).
 - **Launcher CSS exception:** `widget.js` copies token hex from `ui-tokens.md` into inline styles because the host page has no Tailwind. Do not use hex in React/Tailwind components.
 

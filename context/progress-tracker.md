@@ -6,9 +6,9 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ## Current Status
 
-**Phase:** Phase 4 — Embed Widget
-**Last completed:** 10 Embed snippet + preview — copy-paste script, `widget.js` launcher, `/w/[publicId]` preview
-**Next:** 11 Public widget API + script
+**Phase:** Phase 5 — Billing
+**Last completed:** 11 Public widget API + script — `POST /api/widget/chat`, live iframe composer, owner quota + CORS/rate limit
+**Next:** 12 Pricing gates + Stripe test Checkout
 
 ---
 
@@ -35,7 +35,7 @@ Update this file after every completed feature. Any AI agent reading this should
 ### Phase 4 — Embed Widget
 
 - [x] 10 Embed snippet + preview
-- [ ] 11 Public widget API + script
+- [x] 11 Public widget API + script
 
 ### Phase 5 — Billing
 
@@ -50,6 +50,7 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ## Notes
 
+- 2026-08-13 Phase 4 done: widget chat at `POST /api/widget/chat` (service role, CORS `*`, in-memory rate limit, `consume_owner_message_quota`); iframe `WidgetPanel` streams via `streamWidgetReply`. Requires `SUPABASE_SERVICE_ROLE_KEY`. Branding toggle still billing (12).
 - 2026-08-13 Phase 4 start: embed snippet on bot detail; `public/widget.js` launcher + iframe to `/w/[publicId]/embed`; public preview page; `get_bot_widget_config` RPC (anon). No widget chat API yet.
 - 2026-08-13 Phase 3: in-app chat at `/bots/[id]/chat`; shared `lib/rag/retrieve.ts` + `lib/rag/answer.ts`; `POST /api/chat` SSE; quota via `consume_message_quota` RPC (no service role on the in-app path); resume latest app conversation; no citation chips
 - 2026-08-13 Phase 2 hardening: bot settings edit, Storage API delete on bot remove, pending Retry, ingest 409 unless `force`, billing usage page (no Stripe yet), documents column lock (`status`/`error` only)

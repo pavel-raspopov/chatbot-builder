@@ -29,6 +29,7 @@ export default async function WidgetEmbedPage({
 
   return (
     <WidgetPanel
+      publicId={config.public_id}
       botName={config.name}
       welcomeMessage={config.welcome_message}
       showBranding={!config.remove_branding}

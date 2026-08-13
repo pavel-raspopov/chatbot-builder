@@ -5,6 +5,13 @@ export type StreamChatParams = {
   onDelta: (text: string) => void;
 };
 
+export type StreamWidgetParams = {
+  publicId: string;
+  conversationId: string | null;
+  message: string;
+  onDelta: (text: string) => void;
+};
+
 export type StreamChatResult = {
   conversationId: string;
 };
@@ -92,17 +99,16 @@ function applySseBlock(
   }
 }
 
-export async function streamChatReply(
-  params: StreamChatParams,
+async function streamSseReply(
+  url: string,
+  body: Record<string, string | null>,
+  onDelta: (text: string) => void,
+  conversationId: string | null,
 ): Promise<StreamChatResult> {
-  const response = await fetch("/api/chat", {
+  const response = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      botId: params.botId,
-      conversationId: params.conversationId,
-      message: params.message,
-    }),
+    body: JSON.stringify(body),
   });
 
   const contentType = response.headers.get("content-type") ?? "";
@@ -120,7 +126,7 @@ export async function streamChatReply(
 
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
-  const state = { conversationId: params.conversationId };
+  const state = { conversationId };
   let buffer = "";
 
   while (true) {
@@ -132,12 +138,12 @@ export async function streamChatReply(
     const blocks = buffer.split("\n\n");
     buffer = blocks.pop() ?? "";
     for (const block of blocks) {
-      applySseBlock(block, params.onDelta, state);
+      applySseBlock(block, onDelta, state);
     }
   }
 
   if (buffer.trim()) {
-    applySseBlock(buffer, params.onDelta, state);
+    applySseBlock(buffer, onDelta, state);
   }
 
   if (!state.conversationId) {
@@ -148,4 +154,34 @@ export async function streamChatReply(
   }
 
   return { conversationId: state.conversationId };
+}
+
+export async function streamChatReply(
+  params: StreamChatParams,
+): Promise<StreamChatResult> {
+  return streamSseReply(
+    "/api/chat",
+    {
+      botId: params.botId,
+      conversationId: params.conversationId,
+      message: params.message,
+    },
+    params.onDelta,
+    params.conversationId,
+  );
+}
+
+export async function streamWidgetReply(
+  params: StreamWidgetParams,
+): Promise<StreamChatResult> {
+  return streamSseReply(
+    "/api/widget/chat",
+    {
+      publicId: params.publicId,
+      conversationId: params.conversationId,
+      message: params.message,
+    },
+    params.onDelta,
+    params.conversationId,
+  );
 }

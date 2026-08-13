@@ -180,7 +180,7 @@ flowchart LR
 
 1. **Ingest** (`/api/ingest` or background after upload): parse PDF/text → chunk (~500–800 tokens, overlap) → embed → insert `chunks`; set document `ready` / `failed`.
 2. **Retrieve**: `lib/rag/retrieve.ts` embeds the question (`RETRIEVAL_QUERY`) → `match_chunks` RPC (k=8, similarity floor 0.25).
-3. **Generate**: `lib/rag/answer.ts` + `streamChatCompletion()` (`gemini-3.6-flash`). Empty retrieval skips Gemini and returns “I don’t know from your docs.” In-app: authenticated `POST /api/chat` SSE; quota via `consume_message_quota` RPC (`lib/usage.ts`).
+3. **Generate**: `lib/rag/answer.ts` + `streamChatCompletion()` (`gemini-3.6-flash`). Empty retrieval skips Gemini and returns “I don’t know from your docs.” In-app: authenticated `POST /api/chat` SSE; quota via `consume_message_quota` RPC (`lib/usage.ts`). Widget: unauthenticated `POST /api/widget/chat` SSE; service-role client; owner quota via `consume_owner_message_quota`.
 
 ---
 

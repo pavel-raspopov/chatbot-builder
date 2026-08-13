@@ -428,14 +428,14 @@ Last updated: 2026-08-13
 | Border | Header `border-b border-border`; composer dock `border-t border-border` |
 | Border radius | none on the iframe panel (host launcher rounds the frame) |
 | Text — primary | Name `font-display text-sm font-semibold tracking-tight text-text-primary` |
-| Text — secondary | Helper `text-sm leading-relaxed text-text-secondary`; caption `text-xs font-medium text-text-muted` |
+| Text — secondary | Caption `text-xs font-medium text-text-muted`; errors `text-sm text-error` |
 | Spacing | Header `px-4 py-3`; body `p-4 gap-4`; dock `p-4` |
-| Hover / focus | Send uses shared Button; composer disabled in feature 10 |
+| Hover / focus | Send uses shared `ChatComposer` / Button |
 | Shadow | none |
 | Accent usage | none in the panel (launcher accent lives in `widget.js`) |
 
 **Pattern notes:**  
-Match `ChatMessage` / `HeroChatMock` bubbles for the welcome. Disabled composer copies `ChatComposer` chrome. Badge: `text-xs font-medium text-text-muted` “Powered by DocuChat” unless `remove_branding`.
+Match `ChatMessage` / `HeroChatMock` bubbles for welcome and replies. Live composer reuses `ChatComposer` (`inputId="widget-composer"`). Streaming uses `ChatMessage` `streaming`. Errors: `text-sm text-error` + `role="alert"` — no billing link (visitors are not the owner). Badge: `text-xs font-medium text-text-muted` “Powered by DocuChat” unless `remove_branding`.
 
 ### Widget preview
 
@@ -552,7 +552,7 @@ Last updated: 2026-08-13
 
 | Property | Class |
 | --- | --- |
-| Layout | Column `max-w-[720px]`; panel fills remaining viewport `min-h-[calc(100dvh-14rem)]` |
+| Layout | Column fills a fixed viewport slice `h-[calc(100dvh-14rem)] overflow-hidden`; message list `flex-1 overflow-y-auto` so long threads scroll inside the panel |
 | Panel | `rounded-lg border border-border bg-surface shadow-card` |
 | Header | `bg-surface-secondary` + `border-b border-border`; caption `text-xs font-medium text-text-muted` |
 | Title | `font-display text-3xl font-semibold tracking-tight text-text-primary` |

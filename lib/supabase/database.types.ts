@@ -273,6 +273,17 @@ export type Database = {
           used: number
         }[]
       }
+      consume_owner_message_quota: {
+        Args: {
+          p_max: number
+          p_user_id: string
+        }
+        Returns: {
+          allowed: boolean
+          month_limit: number
+          used: number
+        }[]
+      }
       get_bot_widget_config: {
         Args: {
           p_public_id: string

@@ -1,45 +1,43 @@
-# Memory — 10 Embed snippet + preview
+# Memory — 11 Public widget API + script
 
-Last updated: 2026-08-13 (evening)
+Last updated: 2026-08-13 (late evening)
 
 ## What was built
 
-- Bot detail Embed section: `components/bots/EmbedSnippet.tsx` (copy snippet + Preview)
-- `public/widget.js` — vanilla launcher (floating button + iframe); no chat API
-- Public `/w/[publicId]` fake-site preview and `/w/[publicId]/embed` panel (`WidgetPanel`)
-- RPC `get_bot_widget_config(p_public_id)` — anon-safe; returns name, welcome, `remove_branding` only
-- `lib/widget/getBotConfig.ts`, `lib/app-url.ts` (`NEXT_PUBLIC_APP_URL`, fallback `http://localhost:3000`)
-- Embed route CSP `frame-ancestors *` in `next.config.ts`
-- Surfaces: `.impeccable/surfaces/embed.md`; DESIGN.md Embed widget section (merged, not full overwrite)
+- `POST` / `OPTIONS` `/api/widget/chat` — CORS `*`, in-memory IP+bot rate limit, SSE same shape as in-app
+- `consume_owner_message_quota` RPC (`service_role` only) + `consumeOwnerMessageQuota` in `lib/usage.ts`
+- `getOrCreateWidgetConversation` (`source=widget`, `user_id` null)
+- Live `WidgetPanel` composer via `streamWidgetReply`; `widget.js` stays a launcher
+- In-app `ChatThread` locked to `h-[calc(100dvh-14rem)]` so long threads scroll inside the panel
 
 ## Decisions made
 
-- Stub script now, live answers in 11
-- Iframe panel (React/tokens) instead of Shadow DOM; launcher stays vanilla JS
-- Public bot lookup via SECURITY DEFINER RPC, not service role (local `.env.local` has no service role)
-- No branding toggle in 10 — badge follows `remove_branding` (default false)
-- Launcher may copy token hex into `widget.js`; iframe panel uses token classes only
-- Cross-origin local test is supported: paste snippet into another app on a different port while DocuChat runs on 3000
+- Widget chat uses the service-role client after `public_id` + rate limit + owner quota. Do not expand `get_bot_widget_config` to return `system_prompt` or `user_id`.
+- Prefer publishable key in the browser; privileged server key lives in `SUPABASE_SERVICE_ROLE_KEY` (Secret `sb_secret_…` or legacy JWT). Never `NEXT_PUBLIC_`.
+- Ephemeral widget thread (React state only). Host refresh starts a new conversation; launcher toggle keeps the iframe.
+- Gemini free-tier generate-content cap is 20/day per model (`gemini-3.6-flash`). A widget/in-app “Could not generate a reply” after a 200 SSE is that quota, not a broken embed path.
+- Next.js font preload console warnings are harmless; leave them.
 
 ## Problems solved
 
-- Owner-only RLS on `bots` blocked public preview SELECT — RPC instead of admin client
-- `npm run build` failed on `thinkingLevel: "minimal"` vs SDK enum — set `ThinkingLevel.MINIMAL` in `lib/gemini.ts` (type-only; not a chat behavior change)
+- Visitor JWT cannot consume the owner’s quota (`consume_message_quota` uses `auth.uid()`). Owner RPC is service-role only.
+- `supabase migration new` stamped UTC earlier than an existing later-named file — renamed so it sorts last.
+- In-app chat used `min-h-[calc(100dvh-14rem)]`, so the page grew with the thread. Fixed height + inner `overflow-y-auto`.
 
 ## Current state
 
-- Phase 4 item 10 complete; user verified chrome looks fine
-- Widget shows welcome + disabled composer; no `/api/widget/chat`, no quota on embed
-- Snippet `src` is absolute via `getAppOrigin()`; preview page loads relative `/widget.js`
-- Lint/build green when 10 shipped
+- Phase 4 item 11 complete; user verified live widget answers.
+- Local privileged key is required for widget chat (name only: `SUPABASE_SERVICE_ROLE_KEY`). Not in git.
+- Gemini free-tier may 429 after ~20 generate calls/day; wait or enable Google AI billing.
+- Lint/build green when 11 shipped.
 
 ## Next session starts with
 
-**11 Public widget API + script** — `POST /api/widget/chat` (CORS, rate limits, same RAG as in-app), wire the panel composer, persist `source=widget` conversations. Then 12 Stripe.
+**12 Pricing gates + Stripe test Checkout** — billing page, Checkout session, webhook → `profiles.plan`, server-side gates (bots, messages, storage, branding toggle).
 
 ## Open questions
 
-- None blocking 11.
+- None blocking 12.
 
 ## 2026-08-13 — Tests / TDD
 

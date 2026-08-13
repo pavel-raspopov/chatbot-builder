@@ -85,3 +85,33 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** In plans that freeze shared modules, add an exception: a one-line type/compile fix in a frozen file is allowed when the named verify command fails on it. Record the exception in the session notes. Do not expand into behavior changes.
 
 **Principle:** A file-scope freeze cannot override a plan's own verify command. If lint or build fails in frozen code, a minimal type-only fix is in scope; behavior changes still are not.
+
+### Observation 8: supabase migration new timestamps can sort before existing files
+
+**Status:** OPEN
+**Date:** 2026-08-13
+**Session context:** Adding consume_owner_message_quota after get_bot_widget_config
+**Skill:** supabase / writing-plans
+**Type:** open-source
+**Phase/Area:** Schema / migrations
+
+**Issue:** `supabase migration new` stamped the file with UTC time (`20260813182320`), which sorted *before* an existing migration (`20260813195100`) that had been named with a later local-looking timestamp. Applying in filename order would run the new RPC before a later migration that already exists.
+
+**Suggested improvement:** After `supabase migration new`, compare the new filename to the current max in `supabase/migrations/`. If it is not last, rename it to max+1 before writing SQL.
+
+**Principle:** Migration filenames are an ordering key, not a wall-clock. A newly created file must sort after every existing migration in the folder, even when the CLI clock disagrees with earlier names.
+
+### Observation 9: Service-role prerequisite cannot be filled by the agent without CLI login
+
+**Status:** OPEN
+**Date:** 2026-08-13
+**Session context:** Implementing public widget chat that requires SUPABASE_SERVICE_ROLE_KEY
+**Skill:** executing-plans / supabase
+**Type:** open-source
+**Phase/Area:** Env / secrets
+
+**Issue:** The feature plan required adding a service role key to local env. `.env.local` listed only public Supabase keys and Gemini. `supabase projects api-keys` failed (no access token). MCP exposes publishable keys, not the service role. The route correctly 500s with a setup message, but live widget answers cannot be verified until the human pastes the key.
+
+**Suggested improvement:** Plans that need a secret should include a non-secret gate: check that the env *name* is present, document the dashboard path, and do not claim an end-to-end click-through if the key is missing. Do not print or commit the value.
+
+**Principle:** An agent can wire a secret-dependent path and prove the missing-config error; it cannot complete a live integration when the secret is absent from env and unreachable from authenticated tools.

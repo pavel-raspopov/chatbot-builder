@@ -256,7 +256,7 @@ Centered column (`max-w-md` auth): Literata brand in `text-accent`, page title L
 
 - Stacked bubbles; user on `bg-accent-muted`; assistant on `bg-surface-secondary` + border — not rainbow accents
 - Composer row: bordered surface field + accent send control
-- Live thread: `/bots/[id]/chat` — `ChatThread` panel `rounded-lg border-border shadow-card`, sticky composer, empty-docs state, `focus-visible` on links/send
+- Live thread: `/bots/[id]/chat` — `ChatThread` panel `rounded-lg border-border shadow-card`, fixed `h-[calc(100dvh-14rem)]`, message list scrolls inside the panel, empty-docs state, `focus-visible` on links/send
 - Waiting: three muted bouncing dots (`ChatThinkingDots`) until the first token; honor `prefers-reduced-motion`
 
 ### Embed widget
@@ -264,7 +264,7 @@ Centered column (`max-w-md` auth): Literata brand in `text-accent`, page title L
 Public snippet on bot detail; host-page launcher is `public/widget.js`; panel is an iframe to `/w/[publicId]/embed`.
 
 - **Launcher:** 56px forest circle, bottom-right; host pages have no Tailwind — token hex from `ui-tokens.md` may be inlined in `widget.js` only
-- **Panel:** `bg-surface`, header `bg-surface-secondary`, same assistant bubble tokens as in-app chat, composer chrome matching `ChatComposer`
+- **Panel:** `bg-surface`, header `bg-surface-secondary`, same assistant bubble tokens as in-app chat, live `ChatComposer` streaming into `ChatMessage`
 - **Badge:** muted “Powered by DocuChat” unless `remove_branding`
 - **Preview:** `/w/[publicId]` — no app shell; honest `bg-accent-muted` banner; sample article `max-w-[720px]`
 - Surface brief: `.impeccable/surfaces/embed.md`

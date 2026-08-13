@@ -2,7 +2,7 @@
  * DocuChat embed launcher.
  * Injects a floating button and an iframe to /w/{public_id}/embed.
  * Launcher colors copied from context/ui-tokens.md — host pages have no Tailwind.
- * Does not call chat APIs (wired in feature 11).
+ * Chat runs inside the iframe panel (POST /api/widget/chat), not from this launcher.
  */
 (function () {
   "use strict";

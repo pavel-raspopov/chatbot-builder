@@ -116,7 +116,7 @@ export function ChatThread({
   }
 
   return (
-    <div className="flex min-h-[calc(100dvh-14rem)] min-w-0 flex-col">
+    <div className="flex h-[calc(100dvh-14rem)] min-h-0 min-w-0 flex-col overflow-hidden">
       <p className="text-sm text-text-secondary">
         <Link
           href="/bots"

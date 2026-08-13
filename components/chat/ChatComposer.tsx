@@ -7,12 +7,14 @@ export type ChatComposerProps = {
   disabled: boolean;
   sending: boolean;
   onSend: (text: string) => void;
+  inputId?: string;
 };
 
 export function ChatComposer({
   disabled,
   sending,
   onSend,
+  inputId = "chat-composer",
 }: ChatComposerProps): ReactNode {
   const [value, setValue] = useState("");
   const cannotSend = disabled || sending || value.trim().length === 0;
@@ -43,11 +45,11 @@ export function ChatComposer({
       onSubmit={handleSubmit}
       className="flex items-end gap-2 rounded-md border border-border bg-surface px-3 py-2.5"
     >
-      <label className="sr-only" htmlFor="chat-composer">
+      <label className="sr-only" htmlFor={inputId}>
         Message
       </label>
       <textarea
-        id="chat-composer"
+        id={inputId}
         name="message"
         rows={2}
         value={value}
