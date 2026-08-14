@@ -62,7 +62,7 @@ MCP (when relevant) → Skills via AGENTS.md → This file (project rules) → G
 - RPC: `match_chunks(p_bot_id, p_query_embedding, p_match_count)` — `SECURITY INVOKER` so RLS applies; widget chat calls it with the service-role client (RLS bypassed).
 - RPC: `consume_message_quota(p_max)` — `SECURITY DEFINER`, scoped to `auth.uid()`; authenticated cannot UPDATE profile quota columns directly. Plan caps stay in `lib/plans.ts`.
 - RPC: `consume_owner_message_quota(p_user_id, p_max)` — `SECURITY DEFINER`, same month-reset logic for a bot owner. `EXECUTE` granted to `service_role` only (revoked from `anon`/`authenticated`). Used by widget chat via `consumeOwnerMessageQuota` in `lib/usage.ts`.
-- RPC: `get_bot_widget_config(p_public_id)` — `SECURITY DEFINER`, returns only `public_id`, `name`, `welcome_message`, `remove_branding` for the embed preview. `EXECUTE` granted to `anon` (intentional). Never returns `system_prompt` or `user_id`.
+- RPC: `get_bot_widget_config(p_public_id)` — `SECURITY DEFINER`, returns only `public_id`, `name`, `welcome_message`, `remove_branding` for the embed preview. `remove_branding` is **effective**: bot flag AND owner `profiles.plan` in (`pro`, `business`). `EXECUTE` granted to `anon` (intentional). Never returns `system_prompt` or `user_id`.
 - Profiles: `handle_new_user` trigger on `auth.users`; `EXECUTE` revoked from `anon`/`authenticated` (trigger-only).
 - Storage bucket `documents` is private; object path first folder = `auth.uid()`.
 - Documents: authenticated `UPDATE` is column-limited to `status` and `error` (`protect_documents_quota_columns`). Delete files with `storage.remove` (not SQL) before or with the row delete — `deleteDocument` and `deleteBot` both do this.
@@ -73,6 +73,7 @@ MCP (when relevant) → Skills via AGENTS.md → This file (project rules) → G
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` (legacy JWT) is accepted as fallback.
 - `SUPABASE_SERVICE_ROLE_KEY` server-only — never expose to the browser.
 - `NEXT_PUBLIC_APP_URL` — public origin for the copy-paste embed snippet (`lib/app-url.ts`). Fallback `http://localhost:3000`.
+- Stripe test: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_PRO`, `STRIPE_PRICE_BUSINESS` (see Stripe section). `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` is unused.
 
 ### Rules
 
@@ -88,8 +89,8 @@ MCP (when relevant) → Skills via AGENTS.md → This file (project rules) → G
 - MVP: email/password only (`actions/auth.ts`). OAuth later if time allows.
 - Protect `/dashboard`, `/bots`, `/settings/*` in `lib/supabase/proxy.ts`; redirect authed users away from `/login` and `/signup`.
 - `profiles` row created on signup via `handle_new_user` trigger (backfilled for existing users).
-- Profiles billing/usage columns are **not** client-updatable: `REVOKE UPDATE` from `authenticated`/`anon`; service_role writes plan/Stripe/usage. See migration `protect_profiles_billing_columns`.
-- Plan limits live in `lib/plans.ts` and are checked in Server Actions. RLS is ownership only.
+- Profiles billing/usage columns are **not** client-updatable: `REVOKE UPDATE` from `authenticated`/`anon`; service_role writes plan/Stripe/usage via `applySubscriptionToProfile` (`lib/billing.ts`) from the Stripe webhook. See migration `protect_profiles_billing_columns`.
+- Plan limits live in `lib/plans.ts` (`planLimits`, `getPlan`, `getPlanLimits`, `canRemoveBranding`) and are checked in Server Actions. RLS is ownership only.
 - For local demo: Auth → Providers → Email → disable **Confirm email** so signup returns a session immediately.
 
 ---
@@ -129,21 +130,23 @@ Chat completions: `streamChatCompletion()` (`gemini-3.6-flash`, `maxOutputTokens
 
 ## Stripe (test mode)
 
-**Package:** `stripe`
+**Package:** `stripe` (server only). No `@stripe/stripe-js` / Elements — Checkout and Portal are hosted redirects.
 
 ### Flow
 
-1. `POST /api/stripe/checkout` creates a Checkout Session with `client_reference_id` / metadata = user id + target plan.
-2. `POST /api/stripe/webhook` verifies signature and updates `profiles.plan` (+ Stripe customer/subscription ids).
-3. Billing UI may also open Customer Portal for cancellation/change in test mode.
+1. `startCheckout` in `actions/billing.ts` creates a Checkout Session (`mode: subscription`) with `client_reference_id` / metadata = user id + target plan. Reuses `profiles.stripe_customer_id` when set. Used from Free only — an existing `stripe_subscription_id` must go through the Portal.
+2. `POST /api/stripe/webhook` verifies `stripe-signature` (`request.text()` + `constructEvent`) and updates `profiles.plan` (+ customer/subscription ids) via `applySubscriptionToProfile`. Events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`.
+3. `startPortal` opens Customer Portal for plan change / cancel. Missing Stripe env shows setup copy on `/settings/billing` — never fake-writes the plan.
 
 ### Rules
 
-- Use **test** keys only for this demo.
-- Map price IDs via env: `STRIPE_PRICE_PRO`, `STRIPE_PRICE_BUSINESS`.
-- Free plan needs no Stripe customer.
-- Feature gates live in `lib/plans.ts` (`planLimits`, `getPlan`, `getPlanLimits`) and are enforced on the server for writes.
-- Prefer real Stripe test Checkout over a fake “mock billing” screen that never hits Stripe. Mock only if credentials are unavailable — then document the mock clearly in the UI.
+- Use **test** keys only for this demo (`sk_test_`, `price_`, `whsec_`).
+- Map price IDs via env: `STRIPE_PRICE_PRO`, `STRIPE_PRICE_BUSINESS` (also `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`). `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` is unused (no Stripe.js).
+- Free plan needs no Stripe customer. After cancel, keep `stripe_customer_id` and clear `stripe_subscription_id`.
+- Feature gates live in `lib/plans.ts` (`planLimits`, `getPlan`, `getPlanLimits`, `canRemoveBranding`) and are enforced on the server for writes.
+- Prefer real Stripe test Checkout over a fake “mock billing” screen that never hits Stripe. If keys are missing, the billing page says so; do not write `profiles.plan` from the app.
+- Local webhooks: `stripe listen --forward-to localhost:3000/api/stripe/webhook`. Billing `?checkout=success` while still on Free hints at this.
+- Widget branding: `updateBot` may set `bots.remove_branding` only when `canRemoveBranding(plan)`. The public RPC still ANDs with the owner’s plan. Downgrade to Free resets all of that owner’s bot flags.
 
 ### Plan limits (canonical)
 
@@ -174,7 +177,7 @@ Defined also in `project-overview.md` / `PRODUCT.md`:
 - Config via `data-bot` (`public_id`). Script origin comes from `script.src`.
 - Launcher injects a floating button + iframe to `/w/{public_id}/embed`. Chat runs inside the iframe (`POST /api/widget/chat`), not from `widget.js`.
 - Widget API: CORS `Access-Control-Allow-Origin: *`, OPTIONS preflight, in-memory IP+bot rate limit (20/min free/pro, 60/min business), owner monthly quota, SSE same event shape as in-app. Requires `SUPABASE_SERVICE_ROLE_KEY`. Conversations persist with `source=widget` and `user_id` null.
-- Show “Powered by DocuChat” unless `remove_branding` is true (toggle ships in billing).
+- Show “Powered by DocuChat” unless effective `remove_branding` is true (bot flag AND paid plan). Toggle is on bot settings; Free cannot hide the badge.
 - **Launcher CSS exception:** `widget.js` copies token hex from `ui-tokens.md` into inline styles because the host page has no Tailwind. Do not use hex in React/Tailwind components.
 
 ---

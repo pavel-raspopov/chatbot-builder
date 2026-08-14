@@ -113,6 +113,6 @@ Record screenshare + voiceover: signup → upload → in-app chat → embed on s
 - [x] 09 In-app chat UI
 - [x] 10 Embed snippet + preview
 - [x] 11 Public widget API + script
-- [ ] 12 Pricing gates + Stripe test Checkout
+- [x] 12 Pricing gates + Stripe test Checkout
 - [ ] 13 Polish
 - [ ] 14 Presentation

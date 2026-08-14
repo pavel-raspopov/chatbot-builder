@@ -104,3 +104,9 @@ export function getPlan(id: string | null | undefined): Plan {
 export function getPlanLimits(id: string | null | undefined): PlanLimits {
   return planLimits[normalizePlanId(id)];
 }
+
+/** Paid plans may hide the widget “Powered by DocuChat” badge. */
+export function canRemoveBranding(id: string | null | undefined): boolean {
+  const planId = normalizePlanId(id);
+  return planId === 'pro' || planId === 'business';
+}

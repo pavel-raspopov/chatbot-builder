@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect, unstable_rethrow } from "next/navigation";
-import { getPlanLimits, normalizePlanId } from "@/lib/plans";
+import { canRemoveBranding, getPlanLimits, normalizePlanId } from "@/lib/plans";
 import { createClient } from "@/lib/supabase/server";
 
 export type CreateBotActionState = {
@@ -116,6 +116,7 @@ export async function updateBot(
     const name = readString(formData, "name");
     const welcomeMessage = readString(formData, "welcome_message");
     const systemPrompt = readString(formData, "system_prompt");
+    const wantsBrandingRemoved = formData.get("remove_branding") === "on";
 
     if (!botId) {
       return { error: "Missing bot id.", message: null };
@@ -134,12 +135,26 @@ export async function updateBot(
       return { error: "You need to sign in to update this bot.", message: null };
     }
 
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("plan")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profileError || !profile) {
+      return { error: "Could not load your plan. Please try again.", message: null };
+    }
+
+    const removeBranding =
+      canRemoveBranding(profile.plan) && wantsBrandingRemoved;
+
     const { data, error } = await supabase
       .from("bots")
       .update({
         name,
         welcome_message: welcomeMessage || DEFAULT_WELCOME,
         system_prompt: systemPrompt,
+        remove_branding: removeBranding,
       })
       .eq("id", botId)
       .eq("user_id", user.id)

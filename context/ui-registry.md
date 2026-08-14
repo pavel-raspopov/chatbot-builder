@@ -455,22 +455,6 @@ Last updated: 2026-08-13
 **Pattern notes:**  
 Public, no app shell. Honest banner that this is a DocuChat preview. Unknown ids: same title/body empty pattern as other operate 404s. Launcher comes from `public/widget.js`.
 
-### Edit bot form
-
-File: `components/bots/EditBotForm.tsx`  
-Last updated: 2026-08-13
-
-| Property | Class |
-| --- | --- |
-| Form | `mt-8 flex flex-col gap-4` (same as create / auth) |
-| Fields | `Input` name; `Textarea` welcome + system prompt |
-| Errors | `text-sm text-error` + `role="alert"` |
-| Success | `text-sm text-text-secondary` + `role="status"` |
-| Actions | primary submit “Save settings” |
-
-**Pattern notes:**  
-`useActionState` + `updateBot`. Hidden `bot_id`. Same field chrome as create.
-
 ### Usage meter
 
 File: `components/ui/UsageMeter.tsx`  
@@ -489,7 +473,7 @@ Shared by dashboard and billing. Fill width is a single inline `style` percent �
 ### Billing
 
 File: `app/(app)/settings/billing/page.tsx`  
-Last updated: 2026-08-13
+Last updated: 2026-08-14
 
 | Property | Class |
 | --- | --- |
@@ -497,11 +481,46 @@ Last updated: 2026-08-13
 | Title | `font-display text-3xl font-semibold tracking-tight text-text-primary` |
 | Plan badge | `rounded-md bg-accent-muted px-2.5 py-1 text-xs font-medium text-accent` |
 | Body | `text-base leading-relaxed text-text-secondary` |
+| Status | checkout/setup/listen `text-sm text-text-secondary` + `role="status"` |
+| Errors | action errors `text-sm text-error` + `role="alert"` |
 | Meters | shared `UsageMeter` (bots, messages, storage) |
-| Actions | secondary Back to dashboard |
+| Actions | Free: primary Upgrade to Pro + secondary Upgrade to Business; paid: primary Manage subscription; secondary Back to dashboard |
 
 **Pattern notes:**  
-Shows current plan and usage. No Stripe Checkout yet — copy says checkout ships in the billing phase.
+Stripe test-mode copy (card 4242). Checkout/Portal via `BillingActions` (`useActionState` + `startCheckout` / `startPortal`). No cards. Missing keys: setup copy, no fake plan write. `?checkout=success` while still Free hints at `stripe listen`.
+
+### Billing actions
+
+File: `components/billing/BillingActions.tsx`  
+Last updated: 2026-08-14
+
+| Property | Class |
+| --- | --- |
+| Layout | `mt-8 flex flex-col gap-4` |
+| Button row | `flex flex-wrap gap-3` |
+| Errors | `text-sm text-error` + `role="alert"` |
+
+**Pattern notes:**  
+Hidden `plan` input (`pro` / `business`). Same `Button` primary/secondary as the rest of Operate. Pending label “Redirecting…”.
+
+### Edit bot form
+
+File: `components/bots/EditBotForm.tsx`  
+Last updated: 2026-08-14
+
+| Property | Class |
+| --- | --- |
+| Form | `mt-8 flex flex-col gap-4` (same as create / auth) |
+| Fields | `Input` name; `Textarea` welcome + system prompt; native checkbox branding |
+| Checkbox | `h-4 w-4 rounded-sm border-border text-accent focus:ring-1 focus:ring-accent disabled:opacity-60` |
+| Checkbox label | `flex items-start gap-2 text-sm`; help `font-normal leading-relaxed` |
+| Upgrade link | `font-medium text-accent hover:text-accent-dark focus-visible:ring-1 focus-visible:ring-accent` |
+| Errors | `text-sm text-error` + `role="alert"` |
+| Success | `text-sm text-text-secondary` + `role="status"` |
+| Actions | primary submit “Save settings” |
+
+**Pattern notes:**  
+`useActionState` + `updateBot`. Hidden `bot_id`. Checkbox `name="remove_branding"` value `on`; disabled on Free with billing upgrade link. First checkbox in the app — native input, no new primitive.
 
 ### Document upload
 

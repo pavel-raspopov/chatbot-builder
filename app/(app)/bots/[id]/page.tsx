@@ -6,7 +6,7 @@ import { EditBotForm } from "@/components/bots/EditBotForm";
 import { EmbedSnippet } from "@/components/bots/EmbedSnippet";
 import { Button } from "@/components/ui/Button";
 import { buildEmbedSnippet, getAppOrigin } from "@/lib/app-url";
-import { getPlanLimits, normalizePlanId } from "@/lib/plans";
+import { canRemoveBranding, getPlanLimits, normalizePlanId } from "@/lib/plans";
 import { createClient } from "@/lib/supabase/server";
 
 type BotDetailPageProps = {
@@ -37,7 +37,9 @@ export default async function BotDetailPage({
 
   const { data: bot, error } = await supabase
     .from("bots")
-    .select("id, name, welcome_message, system_prompt, public_id, created_at")
+    .select(
+        "id, name, welcome_message, system_prompt, public_id, created_at, remove_branding",
+      )
     .eq("id", id)
     .eq("user_id", user.id)
     .maybeSingle();
@@ -106,7 +108,8 @@ export default async function BotDetailPage({
     );
   }
 
-  const limits = getPlanLimits(normalizePlanId(profileResult.data?.plan));
+  const planId = normalizePlanId(profileResult.data?.plan);
+  const limits = getPlanLimits(planId);
   const usedBytes = (usageResult.data ?? []).reduce(
     (sum, row) => sum + (row.byte_size ?? 0),
     0,
@@ -141,6 +144,8 @@ export default async function BotDetailPage({
         name={bot.name}
         welcomeMessage={bot.welcome_message}
         systemPrompt={bot.system_prompt}
+        removeBranding={bot.remove_branding}
+        canRemoveBranding={canRemoveBranding(planId)}
       />
 
       <section className="mt-10">

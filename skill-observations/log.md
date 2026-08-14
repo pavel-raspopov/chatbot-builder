@@ -115,3 +115,19 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Plans that need a secret should include a non-secret gate: check that the env *name* is present, document the dashboard path, and do not claim an end-to-end click-through if the key is missing. Do not print or commit the value.
 
 **Principle:** An agent can wire a secret-dependent path and prove the missing-config error; it cannot complete a live integration when the secret is absent from env and unreachable from authenticated tools.
+
+### Observation 10: Supabase MCP "loading" is not needsAuth — keep going with repo SQL
+
+**Status:** OPEN
+**Date:** 2026-08-14
+**Session context:** Applying get_bot_widget_config effective-branding migration during Stripe billing
+**Skill:** supabase
+**Type:** open-source
+**Phase/Area:** MCP / apply_migration
+
+**Issue:** `GetMcpTools` for the Supabase server returned `serverStatus: loading` with only `mcp_auth` visible. That is not `needsAuth`. Waiting on auth would stall a DDL step. The repo migration file was created with `npx supabase migration new` first; `apply_migration` succeeded once the server became `ready`.
+
+**Suggested improvement:** Treat `loading` as transient: write the migration SQL in the repo, retry MCP, and do not call `mcp_auth` unless status is `needsAuth` or a tool returns an auth error.
+
+**Principle:** A loading MCP catalog is not an auth failure. Persist the migration in the repo first so a later apply has a file to keep in sync.
+

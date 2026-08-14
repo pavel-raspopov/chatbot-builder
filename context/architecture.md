@@ -58,7 +58,6 @@
 │       ├── ingest/route.ts      → start/process document ingest
 │       ├── widget/chat/route.ts → public embed chat (CORS)
 │       └── stripe/
-│           ├── checkout/route.ts
 │           └── webhook/route.ts
 ├── actions/                     → Server Actions (bots, docs, billing helpers)
 ├── components/
@@ -77,7 +76,8 @@
 │   ├── rag/embed.ts
 │   ├── rag/retrieve.ts
 │   ├── plans.ts                 → Free/Pro/Business limits
-│   └── stripe.ts
+│   ├── stripe.ts                → Stripe client, Checkout/Portal sessions
+│   └── billing.ts               → applySubscriptionToProfile (service role)
 ├── public/
 │   └── widget.js                → embeddable script (or built bundle)
 └── supabase/
@@ -195,10 +195,11 @@ flowchart LR
 
 ## Billing Flow
 
-1. User opens `/settings/billing`, chooses Pro/Business.
-2. Server creates Stripe Checkout Session (test mode) with metadata `user_id`, `plan`.
-3. Webhook `checkout.session.completed` / `customer.subscription.*` updates `profiles.plan`.
-4. Gates in Server Actions / API check `lib/plans.ts` before create-bot, ingest, chat.
+1. User opens `/settings/billing`, chooses Pro/Business (Free only).
+2. `startCheckout` Server Action creates a Stripe Checkout Session (test mode) with metadata `user_id`, `plan`.
+3. Webhook `checkout.session.completed` / `customer.subscription.updated` / `customer.subscription.deleted` updates `profiles.plan` via service role.
+4. Paid users manage or cancel through Customer Portal (`startPortal`) — never a second Checkout subscription.
+5. Gates in Server Actions / API check `lib/plans.ts` before create-bot, ingest, chat, and branding.
 
 ---
 
@@ -206,7 +207,7 @@ flowchart LR
 
 - `@supabase/ssr` via root `proxy.ts` (`lib/supabase/proxy.ts` `updateSession`) refreshes cookies with `getClaims()`.
 - Protect `/dashboard`, `/bots`, `/settings/*`.
-- Landing and `/api/widget/*` remain public.
+- Landing, `/api/widget/*`, and `/api/stripe/webhook` remain public (webhook authenticates via Stripe signature).
 
 ---
 

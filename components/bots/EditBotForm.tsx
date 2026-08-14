@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { updateBot, type UpdateBotActionState } from "@/actions/bots";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -14,6 +15,8 @@ type EditBotFormProps = {
   name: string;
   welcomeMessage: string;
   systemPrompt: string;
+  removeBranding: boolean;
+  canRemoveBranding: boolean;
 };
 
 export function EditBotForm({
@@ -21,6 +24,8 @@ export function EditBotForm({
   name,
   welcomeMessage,
   systemPrompt,
+  removeBranding,
+  canRemoveBranding,
 }: EditBotFormProps): ReactNode {
   const [state, formAction, pending] = useActionState(updateBot, initialState);
 
@@ -48,6 +53,30 @@ export function EditBotForm({
         rows={6}
         defaultValue={systemPrompt}
       />
+      <label className="flex items-start gap-2 text-sm font-medium text-text-primary">
+        <input
+          type="checkbox"
+          name="remove_branding"
+          value="on"
+          defaultChecked={removeBranding && canRemoveBranding}
+          disabled={!canRemoveBranding}
+          className="mt-0.5 h-4 w-4 rounded-sm border-border text-accent focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-60"
+        />
+        <span className="font-normal leading-relaxed">
+          Remove DocuChat badge on the widget
+          {!canRemoveBranding ? (
+            <>
+              {" "}
+              <Link
+                href="/settings/billing"
+                className="font-medium text-accent hover:text-accent-dark focus:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+              >
+                Upgrade to hide it
+              </Link>
+            </>
+          ) : null}
+        </span>
+      </label>
       {state.error ? (
         <p className="text-sm text-error" role="alert">
           {state.error}

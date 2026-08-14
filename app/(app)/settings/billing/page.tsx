@@ -1,11 +1,31 @@
 import type { ReactNode } from "react";
+import { BillingActions } from "@/components/billing/BillingActions";
 import { Button } from "@/components/ui/Button";
 import { UsageMeter } from "@/components/ui/UsageMeter";
 import { formatBytes } from "@/lib/documents";
 import { getPlan, getPlanLimits, normalizePlanId } from "@/lib/plans";
+import { isStripeConfigured } from "@/lib/stripe";
 import { createClient } from "@/lib/supabase/server";
 
-export default async function BillingPage(): Promise<ReactNode> {
+type BillingPageProps = {
+  searchParams: Promise<{ checkout?: string | string[] }>;
+};
+
+function readCheckoutFlag(value: string | string[] | undefined): string | null {
+  const raw = Array.isArray(value) ? value[0] : value;
+  if (raw === "success" || raw === "canceled") {
+    return raw;
+  }
+  return null;
+}
+
+export default async function BillingPage({
+  searchParams,
+}: BillingPageProps): Promise<ReactNode> {
+  const params = await searchParams;
+  const checkout = readCheckoutFlag(params.checkout);
+  const stripeReady = isStripeConfigured();
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -27,7 +47,9 @@ export default async function BillingPage(): Promise<ReactNode> {
   const [profileResult, botsResult, usageResult] = await Promise.all([
     supabase
       .from("profiles")
-      .select("email, plan, messages_used_month")
+      .select(
+        "email, plan, messages_used_month, stripe_customer_id, stripe_subscription_id",
+      )
       .eq("id", user.id)
       .maybeSingle(),
     supabase
@@ -72,6 +94,10 @@ export default async function BillingPage(): Promise<ReactNode> {
     (sum, row) => sum + (row.byte_size ?? 0),
     0,
   );
+  const hasCustomer = Boolean(profileResult.data.stripe_customer_id);
+  const hasSubscription = Boolean(profileResult.data.stripe_subscription_id);
+  const showListenHint =
+    checkout === "success" && planId === "free" && stripeReady;
 
   return (
     <div className="max-w-2xl">
@@ -87,9 +113,39 @@ export default async function BillingPage(): Promise<ReactNode> {
       <p className="mt-3 text-base leading-relaxed text-text-secondary">
         You are on the {plan.name} plan
         {planId === "free" ? " (forever free to try)" : ` (${plan.priceLabel}/mo)`}
-        . Stripe Checkout for upgrades ships in the billing phase — no charges
-        yet.
+        . Stripe test mode — use card 4242 4242 4242 4242. Paid plans can remove
+        the widget badge.
       </p>
+
+      {checkout === "success" ? (
+        <p className="mt-4 text-sm text-text-secondary" role="status">
+          Checkout finished. Your plan updates when Stripe sends the webhook.
+        </p>
+      ) : null}
+
+      {checkout === "canceled" ? (
+        <p className="mt-4 text-sm text-text-secondary" role="status">
+          Checkout was canceled. No charge was made.
+        </p>
+      ) : null}
+
+      {showListenHint ? (
+        <p className="mt-4 text-sm text-text-secondary" role="status">
+          If your plan did not change, forward webhooks locally with{" "}
+          <span className="font-medium text-text-primary">
+            stripe listen --forward-to localhost:3000/api/stripe/webhook
+          </span>{" "}
+          and put the signing secret in STRIPE_WEBHOOK_SECRET.
+        </p>
+      ) : null}
+
+      {!stripeReady ? (
+        <p className="mt-4 text-sm text-text-secondary" role="status">
+          Stripe test keys are not configured. Add STRIPE_SECRET_KEY,
+          STRIPE_PRICE_PRO, and STRIPE_PRICE_BUSINESS to .env.local to enable
+          Checkout.
+        </p>
+      ) : null}
 
       <div className="mt-8 space-y-5">
         <UsageMeter label="Bots" used={botCount} limit={limits.maxBots} />
@@ -105,6 +161,14 @@ export default async function BillingPage(): Promise<ReactNode> {
           valueLabel={`${formatBytes(usedBytes)} / ${formatBytes(limits.maxStorageBytes)}`}
         />
       </div>
+
+      {stripeReady ? (
+        <BillingActions
+          planId={planId}
+          hasSubscription={hasSubscription}
+          hasCustomer={hasCustomer}
+        />
+      ) : null}
 
       <p className="mt-8 text-sm text-text-secondary">
         Signed in as{" "}

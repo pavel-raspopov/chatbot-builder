@@ -1,45 +1,44 @@
-# Memory — 11 Public widget API + script
+# Memory — 12 Pricing gates + Stripe test Checkout
 
-Last updated: 2026-08-13 (late evening)
+Last updated: 2026-08-14 (evening)
 
 ## What was built
 
-- `POST` / `OPTIONS` `/api/widget/chat` — CORS `*`, in-memory IP+bot rate limit, SSE same shape as in-app
-- `consume_owner_message_quota` RPC (`service_role` only) + `consumeOwnerMessageQuota` in `lib/usage.ts`
-- `getOrCreateWidgetConversation` (`source=widget`, `user_id` null)
-- Live `WidgetPanel` composer via `streamWidgetReply`; `widget.js` stays a launcher
-- In-app `ChatThread` locked to `h-[calc(100dvh-14rem)]` so long threads scroll inside the panel
+- Stripe test Checkout + Customer Portal via `actions/billing.ts` (`startCheckout`, `startPortal`); hosted Checkout redirect, no Stripe.js
+- `POST /api/stripe/webhook` — `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted` → `applySubscriptionToProfile` (`lib/billing.ts`, service role)
+- Billing page: test-mode copy, Upgrade to Pro/Business, Manage subscription, `?checkout=success|canceled`, setup copy if keys missing
+- Branding checkbox on `EditBotForm`; `updateBot` forces off on Free; `get_bot_widget_config` returns effective branding (flag AND paid plan). Migration `widget_config_effective_branding` applied remotely
+- `lib/plans.ts` `canRemoveBranding`; `stripe` package; `.env.example` has `STRIPE_PRICE_PRO` / `STRIPE_PRICE_BUSINESS`
 
 ## Decisions made
 
-- Widget chat uses the service-role client after `public_id` + rate limit + owner quota. Do not expand `get_bot_widget_config` to return `system_prompt` or `user_id`.
-- Prefer publishable key in the browser; privileged server key lives in `SUPABASE_SERVICE_ROLE_KEY` (Secret `sb_secret_…` or legacy JWT). Never `NEXT_PUBLIC_`.
-- Ephemeral widget thread (React state only). Host refresh starts a new conversation; launcher toggle keeps the iframe.
-- Gemini free-tier generate-content cap is 20/day per model (`gemini-3.6-flash`). A widget/in-app “Could not generate a reply” after a 200 SSE is that quota, not a broken embed path.
-- Next.js font preload console warnings are harmless; leave them.
+- Server Actions for Checkout/Portal; Route Handler only for the webhook (not `app/api/stripe/checkout`)
+- Paid plan change/cancel goes through Portal so we never open a second subscription
+- Never fake-write `profiles.plan` from the app. Missing keys → setup copy
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` unused (no Elements)
+- Widget RPC still must not return `system_prompt` or `user_id`
 
 ## Problems solved
 
-- Visitor JWT cannot consume the owner’s quota (`consume_message_quota` uses `auth.uid()`). Owner RPC is service-role only.
-- `supabase migration new` stamped UTC earlier than an existing later-named file — renamed so it sorts last.
-- In-app chat used `min-h-[calc(100dvh-14rem)]`, so the page grew with the thread. Fixed height + inner `overflow-y-auto`.
+- Checkout `resource_missing` on `line_items[0][price]`: env had a Product ID (`prod_…`). Stripe Checkout needs a Price ID (`price_…`). User fixed `.env.local`; live flow then passed
+- Ignore Stripe Dashboard wizards (Payment Links, Pricing tables, embedded Checkout). This app uses API-created hosted Checkout
+- Local webhooks: `stripe listen --forward-to localhost:3000/api/stripe/webhook` → `STRIPE_WEBHOOK_SECRET`; restart `npm run dev` after env changes
 
 ## Current state
 
-- Phase 4 item 11 complete; user verified live widget answers.
-- Local privileged key is required for widget chat (name only: `SUPABASE_SERVICE_ROLE_KEY`). Not in git.
-- Gemini free-tier may 429 after ~20 generate calls/day; wait or enable Google AI billing.
-- Lint/build green when 11 shipped.
+- Phase 5 item 12 complete. User verified: Free → Pro (card 4242), webhook updates plan, second bot, branding hide, Portal cancel → Free
+- Stripe test keys live only in `.env.local` (not git). Names: `STRIPE_SECRET_KEY`, `STRIPE_PRICE_PRO`, `STRIPE_PRICE_BUSINESS`, `STRIPE_WEBHOOK_SECRET`
+- Lint/build green. TDD still waived until Phase 6
 
 ## Next session starts with
 
-**12 Pricing gates + Stripe test Checkout** — billing page, Checkout session, webhook → `profiles.plan`, server-side gates (bots, messages, storage, branding toggle).
+**13 Polish** — empty states, error copy, loading, mobile landing/app, seed demo bot if useful.
 
 ## Open questions
 
-- None blocking 12.
+- None blocking 13.
 
-## 2026-08-13 — Tests / TDD
+## Tests / TDD
 
-- No test runner until Phase 6. Verify with `npm run lint`, `npm run build`, and a manual click-through.
-- TDD waived. Do not edit shared `lib/` (`rag`, `plans`, `usage`, Supabase clients) unless the feature plan lists them. A one-line type/compile fix in frozen code is allowed if the named verify command fails on it.
+- No test runner until Phase 6. Verify with `npm run lint`, `npm run build`, and a manual click-through
+- Do not edit shared `lib/` (`rag`, `usage`, Gemini, Supabase clients) unless the feature plan lists them
