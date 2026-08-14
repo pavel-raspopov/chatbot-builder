@@ -58,7 +58,7 @@ Items: Dashboard, Bots, Billing (+ Sign out).
 
 ## Auth / Operate gates (shipped)
 
-- Centered column: auth `max-w-md` (`px-6 py-16`); app operate pages (dashboard, bots) `max-w-2xl` inside app main
+- Centered column: auth `max-w-md` (`px-6 py-16`); app operate pages (dashboard, bots, billing, bot detail) `mx-auto max-w-2xl` inside app main — same horizontal centering as in-app chat
 - Brand wordmark Literata `text-accent`; title Literata `text-text-primary`; body `text-text-secondary`
 - Forms: shared `Input` + `Button`; stack `gap-4`; errors `text-error` + `role="alert"`
 - No OAuth chrome in MVP; no decorative cards on gate pages or dashboard meters

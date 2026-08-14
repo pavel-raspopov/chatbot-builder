@@ -11,7 +11,7 @@ export default async function BotsPage(): Promise<ReactNode> {
 
   if (!user) {
     return (
-      <div className="max-w-2xl">
+      <div className="mx-auto max-w-2xl">
         <h1 className="font-display text-3xl font-semibold tracking-tight text-text-primary">
           Bots
         </h1>
@@ -33,7 +33,7 @@ export default async function BotsPage(): Promise<ReactNode> {
 
   if (profileResult.error || !profileResult.data) {
     return (
-      <div className="max-w-2xl">
+      <div className="mx-auto max-w-2xl">
         <h1 className="font-display text-3xl font-semibold tracking-tight text-text-primary">
           Bots
         </h1>
@@ -46,7 +46,7 @@ export default async function BotsPage(): Promise<ReactNode> {
 
   if (botsResult.error) {
     return (
-      <div className="max-w-2xl">
+      <div className="mx-auto max-w-2xl">
         <h1 className="font-display text-3xl font-semibold tracking-tight text-text-primary">
           Bots
         </h1>

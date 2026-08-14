@@ -149,11 +149,6 @@ export async function POST(request: Request): Promise<Response> {
       return jsonError("Bot not found.", 404);
     }
 
-    const quota = await consumeOwnerMessageQuota(admin, bot.user_id);
-    if (!quota.ok) {
-      return jsonError(quota.error, quota.statusCode);
-    }
-
     let chunks: RetrievedChunk[];
     try {
       chunks = await retrieveChunks(admin, bot.id, body.message);
@@ -165,15 +160,14 @@ export async function POST(request: Request): Promise<Response> {
       );
     }
 
+    const quota = await consumeOwnerMessageQuota(admin, bot.user_id);
+    if (!quota.ok) {
+      return jsonError(quota.error, quota.statusCode);
+    }
+
     const conversationId = await getOrCreateWidgetConversation(admin, {
       botId: bot.id,
       conversationId: body.conversationId,
-    });
-
-    await insertMessage(admin, {
-      conversationId,
-      role: "user",
-      content: body.message,
     });
 
     const stream = new ReadableStream({
@@ -205,11 +199,16 @@ export async function POST(request: Request): Promise<Response> {
           try {
             await insertMessage(admin, {
               conversationId,
+              role: "user",
+              content: body.message,
+            });
+            await insertMessage(admin, {
+              conversationId,
               role: "assistant",
               content: assistantText,
             });
           } catch (persistError) {
-            console.error("[api/widget/chat] persist assistant", persistError);
+            console.error("[api/widget/chat] persist turn", persistError);
           }
 
           controller.enqueue(encodeSse({ type: "done", conversationId }));

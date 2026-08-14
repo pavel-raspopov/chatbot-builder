@@ -24,7 +24,7 @@ export default async function BotDetailPage({
 
   if (!user) {
     return (
-      <div className="max-w-2xl">
+      <div className="mx-auto max-w-2xl">
         <h1 className="font-display text-3xl font-semibold tracking-tight text-text-primary">
           Bot
         </h1>
@@ -46,7 +46,7 @@ export default async function BotDetailPage({
 
   if (error) {
     return (
-      <div className="max-w-2xl">
+      <div className="mx-auto max-w-2xl">
         <h1 className="font-display text-3xl font-semibold tracking-tight text-text-primary">
           Bot
         </h1>
@@ -59,7 +59,7 @@ export default async function BotDetailPage({
 
   if (!bot) {
     return (
-      <div className="max-w-2xl">
+      <div className="mx-auto max-w-2xl">
         <h1 className="font-display text-3xl font-semibold tracking-tight text-text-primary">
           Bot not found
         </h1>
@@ -88,7 +88,7 @@ export default async function BotDetailPage({
 
   if (documentsResult.error || profileResult.error || usageResult.error) {
     return (
-      <div className="max-w-2xl">
+      <div className="mx-auto max-w-2xl">
         <p className="text-sm text-text-secondary">
           <Link
             href="/bots"
@@ -117,7 +117,7 @@ export default async function BotDetailPage({
   const documents = documentsResult.data ?? [];
 
   return (
-    <div className="max-w-2xl">
+    <div className="mx-auto max-w-2xl">
       <p className="text-sm text-text-secondary">
         <Link
           href="/bots"

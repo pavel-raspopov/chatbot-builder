@@ -33,7 +33,7 @@ export default async function BillingPage({
 
   if (!user) {
     return (
-      <div className="max-w-2xl">
+      <div className="mx-auto max-w-2xl">
         <h1 className="font-display text-3xl font-semibold tracking-tight text-text-primary">
           Billing
         </h1>
@@ -61,7 +61,7 @@ export default async function BillingPage({
 
   if (profileResult.error || !profileResult.data) {
     return (
-      <div className="max-w-2xl">
+      <div className="mx-auto max-w-2xl">
         <h1 className="font-display text-3xl font-semibold tracking-tight text-text-primary">
           Billing
         </h1>
@@ -74,7 +74,7 @@ export default async function BillingPage({
 
   if (botsResult.error || usageResult.error) {
     return (
-      <div className="max-w-2xl">
+      <div className="mx-auto max-w-2xl">
         <h1 className="font-display text-3xl font-semibold tracking-tight text-text-primary">
           Billing
         </h1>
@@ -100,7 +100,7 @@ export default async function BillingPage({
     checkout === "success" && planId === "free" && stripeReady;
 
   return (
-    <div className="max-w-2xl">
+    <div className="mx-auto max-w-2xl">
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="font-display text-3xl font-semibold tracking-tight text-text-primary">
           Billing

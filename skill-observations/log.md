@@ -131,3 +131,33 @@ resolved statuses always carry their resolution date
 
 **Principle:** A loading MCP catalog is not an auth failure. Persist the migration in the repo first so a later apply has a file to keep in sync.
 
+### Observation 11: Phase-complete reviews must grep leftover stub copy
+
+**Status:** OPEN
+**Date:** 2026-08-14
+**Session context:** Feature-review of phases 3–5 plus overall vs project-brief; widget chat was already shipped
+**Skill:** feature-review
+**Type:** open-source
+**Phase/Area:** Layer 1 — Plan alignment / leftover copy from an earlier increment
+
+**Issue:** Item 11 shipped live widget replies, but the public preview page still says replies are not connected yet. The UI registry documented the preview layout and did not record that sentence, so imprint did not catch it.
+
+**Suggested improvement:** In Layer 1 of a phase or overall review, search the product UI (not docs) for leftover stub phrases such as "not yet", "not connected", "coming soon". Treat a shipped feature whose user-facing copy still describes the previous stub as Important, even when the code path works.
+
+**Principle:** Completing a later increment does not update earlier placeholder copy. A review that only checks that the new path exists will miss screens that still tell the user the feature is unfinished.
+
+### Observation 12: Honor explicit triage — Important plus named Minors only
+
+**Status:** OPEN
+**Date:** 2026-08-14
+**Session context:** After a review-only session, the user asked to fix all Important items and one named Minor (favicon), and to skip other Minors if they do not matter for the demo
+**Skill:** feature-review
+**Type:** open-source
+**Phase/Area:** Step 4 — Let the Developer Decide
+
+**Issue:** The review listed seven Minors. The user named favicon and said the rest could be skipped for the demo. Expanding into clipboard errors, stripe-listen copy, or mobile nav links would have ignored that triage.
+
+**Suggested improvement:** After Step 4, treat the user's keep/skip list as the implementation scope. Do not "while you are here" remaining Minors unless they block the named work.
+
+**Principle:** A review that asks the developer to triage is wasted if the implementer then fixes everything anyway. Named keep/skip is the spec.
+

@@ -43,8 +43,8 @@ export default async function WidgetPreviewPage({
         </h1>
         <p className="mt-3 text-base leading-relaxed text-text-secondary">
           This page stands in for a help center or product site. Use the chat
-          button in the corner to see how the widget looks. Replies are not
-          connected in this preview yet.
+          button in the corner to ask from this bot’s docs — the same replies
+          visitors get on your site.
         </p>
         <p className="mt-6 text-base leading-relaxed text-text-secondary">
           Paste the same script on your website when you are ready to go live.

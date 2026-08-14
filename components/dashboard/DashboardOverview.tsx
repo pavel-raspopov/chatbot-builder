@@ -28,7 +28,7 @@ export function DashboardOverview({
   const isEmpty = botCount === 0;
 
   return (
-    <div className="max-w-2xl">
+    <div className="mx-auto max-w-2xl">
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="font-display text-3xl font-semibold tracking-tight text-text-primary">
           Dashboard

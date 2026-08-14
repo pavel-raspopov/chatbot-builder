@@ -257,12 +257,12 @@ Label wraps the control. Prefer shared `Input` over ad-hoc `<input>`. Disabled: 
 ### Dashboard overview
 
 File: `components/dashboard/DashboardOverview.tsx` (loaded by `app/(app)/dashboard/page.tsx`)  
-Last updated: 2026-08-12
+Last updated: 2026-08-14
 
 | Property | Class |
 | --- | --- |
 | Background | inherits shell `bg-background`; no decorative cards |
-| Layout | content `max-w-2xl` inside app main |
+| Layout | content `mx-auto max-w-2xl` inside app main |
 | Title | `font-display text-3xl font-semibold tracking-tight text-text-primary` |
 | Plan badge | `rounded-md bg-accent-muted px-2.5 py-1 text-xs font-medium text-accent` |
 | Body | `text-base leading-relaxed text-text-secondary` |
@@ -274,18 +274,18 @@ Last updated: 2026-08-12
 | Shadow | none |
 
 **Pattern notes:**  
-Server page fetches `profiles` + `bots` count under RLS; presentational overview only. Meters use shared `UsageMeter`. At bot limit the primary CTA is Upgrade.
+Server page fetches `profiles` + `bots` count under RLS; presentational overview only. Meters use shared `UsageMeter`. At bot limit the primary CTA is Upgrade. Column is `mx-auto max-w-2xl` — same horizontal centering as in-app chat.
 
 ### AppNavbar
 
 File: `components/layout/AppNavbar.tsx`  
-Last updated: 2026-08-13
+Last updated: 2026-08-14
 
 | Property | Class |
 | --- | --- |
 | Background | `bg-surface/95 backdrop-blur-sm` |
 | Border | `border-b border-border` |
-| Height / layout | `h-16`, inner `max-w-[1440px] px-6 sm:px-8` |
+| Height / layout | `sticky top-0 z-50 shrink-0`; inner `max-w-[1440px] px-4 py-3 sm:h-16 sm:flex-row sm:px-6 sm:py-0 lg:px-8` |
 | Brand text | `font-display text-xl font-semibold tracking-tight text-text-primary` |
 | Nav link inactive | `text-sm font-medium text-text-secondary hover:text-accent` |
 | Nav link active | `text-sm font-medium text-accent` |
@@ -294,7 +294,7 @@ Last updated: 2026-08-13
 | Narrow screens | Brand + Sign out on the first row; Dashboard / Bots / Billing wrap below. `px-4` until `sm`. |
 
 **Pattern notes:**  
-Client component for `usePathname`. Active: color only (no underline). Brand links to `/dashboard`. Billing matches `/settings/*`. Do not keep all nav items in one unwrapping row — that overflows below ~400px.
+Client component for `usePathname`. Active: color only (no underline). Brand links to `/dashboard`. Billing matches `/settings/*`. `shrink-0` so the chat `h-dvh` column cannot compress the header. Do not keep all nav items in one unwrapping row — that overflows below ~400px.
 
 ### AppFooter
 
@@ -314,16 +314,18 @@ App chrome only — no marketing anchors. Tagline: “Product docs chatbot”.
 
 ### App shell layout
 
-File: `app/(app)/layout.tsx`  
-Last updated: 2026-08-11
+File: `app/(app)/layout.tsx` + `components/layout/AppShell.tsx`  
+Last updated: 2026-08-14
 
 | Property | Class |
 | --- | --- |
-| Page shell | `flex min-h-dvh flex-col bg-background` |
-| Main | `mx-auto w-full max-w-[1440px] flex-1 px-6 py-8 sm:px-8` |
+| Page shell (operate) | `flex min-h-dvh min-w-0 flex-col bg-background` |
+| Page shell (in-app chat) | `flex h-dvh min-h-0 min-w-0 flex-col overflow-hidden bg-background` |
+| Main (operate) | `mx-auto w-full min-w-0 max-w-[1440px] flex-1 px-4 py-8 sm:px-8` |
+| Main (in-app chat) | same max-width; `flex min-h-0 flex-1 flex-col overflow-hidden px-4 py-4 sm:px-8 sm:py-6` |
 
 **Pattern notes:**  
-Wraps AppNavbar → main → AppFooter. Top nav only — no sidebar.
+`AppShell` is a client wrapper so chat can hide `AppFooter` and fill the viewport. Chat must use `h-dvh overflow-hidden` — `min-h-dvh` is only a floor and lets the page grow (double scrollbar). Nested `flex-1 min-h-0` only works with that definite height. Operate pages use `mx-auto max-w-2xl` inside main (same centering as chat). Top nav only — no sidebar. Navbar is `shrink-0`.
 
 ### Textarea
 
@@ -346,11 +348,11 @@ Same chrome as `Input`. Prefer shared `Textarea` for multi-line fields (welcome 
 ### Bots list
 
 File: `components/bots/BotsList.tsx` (loaded by `app/(app)/bots/page.tsx`)  
-Last updated: 2026-08-13
+Last updated: 2026-08-14
 
 | Property | Class |
 | --- | --- |
-| Layout | `max-w-2xl` |
+| Layout | `mx-auto max-w-2xl` |
 | Title | `font-display text-3xl font-semibold tracking-tight text-text-primary` |
 | Meta | `text-base leading-relaxed text-text-secondary` (`n / max` bots) |
 | List | `divide-y divide-border border-y border-border`; rows `py-4` |
@@ -384,7 +386,7 @@ Last updated: 2026-08-13
 
 | Property | Class |
 | --- | --- |
-| Layout | `max-w-2xl` |
+| Layout | `mx-auto max-w-2xl` |
 | Breadcrumb | `text-sm`; link `text-accent` |
 | Title | `font-display text-3xl font-semibold tracking-tight text-text-primary` |
 | Body | `text-base leading-relaxed text-text-secondary` |
@@ -440,7 +442,7 @@ Match `ChatMessage` / `HeroChatMock` bubbles for welcome and replies. Live compo
 ### Widget preview
 
 File: `app/w/[publicId]/page.tsx`  
-Last updated: 2026-08-13
+Last updated: 2026-08-14
 
 | Property | Class |
 | --- | --- |
@@ -453,7 +455,7 @@ Last updated: 2026-08-13
 | Shadow | none |
 
 **Pattern notes:**  
-Public, no app shell. Honest banner that this is a DocuChat preview. Unknown ids: same title/body empty pattern as other operate 404s. Launcher comes from `public/widget.js`.
+Public, no app shell. Honest banner that this is a DocuChat preview. Chat in the corner is live (same widget as a customer site). Unknown ids: same title/body empty pattern as other operate 404s. Launcher comes from `public/widget.js`.
 
 ### Usage meter
 
@@ -477,7 +479,7 @@ Last updated: 2026-08-14
 
 | Property | Class |
 | --- | --- |
-| Layout | `max-w-2xl` |
+| Layout | `mx-auto max-w-2xl` |
 | Title | `font-display text-3xl font-semibold tracking-tight text-text-primary` |
 | Plan badge | `rounded-md bg-accent-muted px-2.5 py-1 text-xs font-medium text-accent` |
 | Body | `text-base leading-relaxed text-text-secondary` |
@@ -567,12 +569,12 @@ Same divider-list pattern as Bots list. Status labels via `formatDocumentStatus`
 ### Chat thread
 
 File: `components/chat/ChatThread.tsx` (page `app/(app)/bots/[id]/chat/page.tsx`)  
-Last updated: 2026-08-13
+Last updated: 2026-08-14
 
 | Property | Class |
 | --- | --- |
-| Layout | Column fills a fixed viewport slice `h-[calc(100dvh-14rem)] overflow-hidden`; message list `flex-1 overflow-y-auto` so long threads scroll inside the panel |
-| Panel | `rounded-lg border border-border bg-surface shadow-card` |
+| Layout | Column fills remaining shell height `flex-1 min-h-0 overflow-hidden`; message list `flex-1 overflow-y-auto` so long threads scroll inside the panel |
+| Panel | `rounded-lg border border-border bg-surface shadow-card`; `mt-4 sm:mt-6`
 | Header | `bg-surface-secondary` + `border-b border-border`; caption `text-xs font-medium text-text-muted` |
 | Title | `font-display text-3xl font-semibold tracking-tight text-text-primary` |
 | Body | `text-base leading-relaxed text-text-secondary` |
@@ -583,7 +585,58 @@ Last updated: 2026-08-13
 | Shadow | `shadow-card` on the panel |
 
 **Pattern notes:**  
-Operate chat, not a new visual world. Match `HeroChatMock` chrome. Composer disabled when the bot has no `ready` documents. Welcome bubble only when the stored thread is empty.
+Operate chat, not a new visual world. Match `HeroChatMock` chrome. Composer disabled when the bot has no `ready` documents. Welcome bubble only when the stored thread is empty. App footer is hidden on this route so the panel is the only scroller.
+
+### Route loading
+
+File: `components/layout/RouteLoading.tsx` (`app/loading.tsx`, `app/(app)/loading.tsx`)  
+Last updated: 2026-08-14
+
+| Property | Class |
+| --- | --- |
+| Layout | `mx-auto max-w-2xl px-6 py-16` |
+| Text | `text-base leading-relaxed text-text-secondary` |
+| Status | `role="status"` |
+
+**Pattern notes:**  
+Copy only — no spinner in the middle of the page. Same operate column as dashboard errors.
+
+### Route error
+
+File: `components/layout/RouteError.tsx` (`app/error.tsx`, `app/(app)/error.tsx`)  
+Last updated: 2026-08-14
+
+| Property | Class |
+| --- | --- |
+| Layout | `mx-auto max-w-2xl px-6 py-16` |
+| Title | `font-display text-3xl font-semibold tracking-tight text-text-primary` |
+| Body | `text-base leading-relaxed text-text-secondary` |
+| Action | secondary `Button` “Try again” |
+
+**Pattern notes:**  
+Do not render `error.message` (may leak). Log with `[route]` prefix. Client-only because Next.js `error.tsx` must be a Client Component.
+
+### Route not found
+
+File: `components/layout/RouteNotFound.tsx` (`app/not-found.tsx`)  
+Last updated: 2026-08-14
+
+| Property | Class |
+| --- | --- |
+| Layout | `mx-auto max-w-2xl px-6 py-16` |
+| Title | `font-display text-3xl font-semibold tracking-tight text-text-primary` |
+| Body | `text-base leading-relaxed text-text-secondary` |
+| Actions | primary Home, secondary Dashboard |
+
+**Pattern notes:**  
+Same empty/error column as operate 404s (bot not found). Unauthenticated Dashboard hits the login gate.
+
+### Favicon
+
+File: `app/icon.svg`  
+Last updated: 2026-08-14
+
+Rounded square `rx="8"`, fill accent `#1f6b4f`, letter D in `#f7faf8`. Hex is required in the SVG (no Tailwind on the icon file). Do not invent a second mark.
 
 ### Chat message
 
@@ -654,7 +707,7 @@ Text fields: `focus:outline-none focus:ring-1 focus:ring-accent`. Links and butt
 ## Layout Standard
 
 - Marketing: `max-w-[1120px] px-6`, header `h-16`, sections `py-20 sm:py-24`
-- App: `max-w-[1440px]`, padding `px-4 py-8 sm:px-8`, top nav only; `overflow-x-hidden` on `body`; usable from 300px
+- App: `max-w-[1440px]`, padding `px-4 py-8 sm:px-8`, top nav only; operate columns `mx-auto max-w-2xl`; `overflow-x-hidden` on `body`; usable from 300px
 
 ## Motion Standard
 

@@ -35,7 +35,7 @@ export function AppNavbar(): ReactNode {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-surface/95 backdrop-blur-sm">
+    <header className="sticky top-0 z-50 shrink-0 border-b border-border bg-surface/95 backdrop-blur-sm">
       <div className="mx-auto flex w-full min-w-0 max-w-[1440px] flex-col gap-2 px-4 py-3 sm:h-16 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-0 lg:px-8">
         <div className="flex items-center justify-between gap-3">
           <Link

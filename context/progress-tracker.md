@@ -7,8 +7,8 @@ Update this file after every completed feature. Any AI agent reading this should
 ## Current Status
 
 **Phase:** Phase 6 — Polish
-**Last completed:** 12 Pricing gates + Stripe test Checkout — Checkout/Portal Server Actions, webhook → `profiles.plan`, branding gate
-**Next:** 13 Polish
+**Last completed:** 13 Polish — review Important items + favicon (preview copy, chat persist/quota order, chat viewport, loading/error/not-found)
+**Next:** 14 Presentation
 
 ---
 
@@ -43,12 +43,14 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ### Phase 6 — Polish + Demo
 
-- [ ] 13 Polish
+- [x] 13 Polish
 - [ ] 14 Presentation
 
 ---
 
 ## Notes
+
+- 2026-08-14 Phase 6 item 13: Feature-review Important fixes — widget preview copy (live replies), retrieve-then-quota and persist user+assistant after a successful stream (`/api/chat` and `/api/widget/chat`), in-app chat fills remaining viewport (`AppShell` hides footer on chat), `loading.tsx` / `error.tsx` / `not-found.tsx`, `app/icon.svg`. Skipped seed demo bot and remaining Minor items (clipboard alert, stripe listen hint, mobile Features links). Next: 14 Presentation.
 
 - 2026-08-14 Phase 5: Stripe test Checkout + Portal via `actions/billing.ts`; webhook `POST /api/stripe/webhook`; `applySubscriptionToProfile` (service role). Branding checkbox on bot settings; `get_bot_widget_config` returns effective `remove_branding` (flag AND paid plan). Live Checkout needs `STRIPE_SECRET_KEY` + `STRIPE_PRICE_PRO` / `STRIPE_PRICE_BUSINESS` + `stripe listen` for `STRIPE_WEBHOOK_SECRET`. Decision: Server Actions for Checkout/Portal; Route Handler only for the webhook (not `app/api/stripe/checkout`).
 - 2026-08-13 Phase 4 done: widget chat at `POST /api/widget/chat` (service role, CORS `*`, in-memory rate limit, `consume_owner_message_quota`); iframe `WidgetPanel` streams via `streamWidgetReply`. Requires `SUPABASE_SERVICE_ROLE_KEY`.

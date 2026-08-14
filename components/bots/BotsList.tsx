@@ -64,7 +64,7 @@ export function BotsList({
   }
 
   return (
-    <div className="max-w-2xl">
+    <div className="mx-auto max-w-2xl">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-3xl font-semibold tracking-tight text-text-primary">
           Bots

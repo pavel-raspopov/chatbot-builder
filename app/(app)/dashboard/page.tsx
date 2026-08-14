@@ -11,7 +11,7 @@ export default async function DashboardPage(): Promise<ReactNode> {
 
   if (!user) {
     return (
-      <div className="max-w-2xl">
+      <div className="mx-auto max-w-2xl">
         <h1 className="font-display text-3xl font-semibold tracking-tight text-text-primary">
           Dashboard
         </h1>
@@ -36,7 +36,7 @@ export default async function DashboardPage(): Promise<ReactNode> {
 
   if (profileResult.error) {
     return (
-      <div className="max-w-2xl">
+      <div className="mx-auto max-w-2xl">
         <h1 className="font-display text-3xl font-semibold tracking-tight text-text-primary">
           Dashboard
         </h1>
@@ -49,7 +49,7 @@ export default async function DashboardPage(): Promise<ReactNode> {
 
   if (!profileResult.data) {
     return (
-      <div className="max-w-2xl">
+      <div className="mx-auto max-w-2xl">
         <h1 className="font-display text-3xl font-semibold tracking-tight text-text-primary">
           Dashboard
         </h1>
@@ -63,7 +63,7 @@ export default async function DashboardPage(): Promise<ReactNode> {
 
   if (botsResult.error) {
     return (
-      <div className="max-w-2xl">
+      <div className="mx-auto max-w-2xl">
         <h1 className="font-display text-3xl font-semibold tracking-tight text-text-primary">
           Dashboard
         </h1>

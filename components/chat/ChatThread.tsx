@@ -116,7 +116,7 @@ export function ChatThread({
   }
 
   return (
-    <div className="flex h-[calc(100dvh-14rem)] min-h-0 min-w-0 flex-col overflow-hidden">
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <p className="text-sm text-text-secondary">
         <Link
           href="/bots"
@@ -141,7 +141,7 @@ export function ChatThread({
         uploaded.
       </p>
 
-      <div className="mt-8 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg border border-border bg-surface shadow-card">
+      <div className="mt-4 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg border border-border bg-surface shadow-card sm:mt-6">
         <div className="flex items-center gap-2 border-b border-border bg-surface-secondary px-4 py-3">
           <span className="size-2.5 rounded-full bg-border-muted" />
           <span className="size-2.5 rounded-full bg-border-muted" />

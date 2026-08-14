@@ -22,7 +22,7 @@ export default async function BotChatPage({
 
   if (!user) {
     return (
-      <div className="max-w-2xl">
+      <div className="mx-auto max-w-2xl">
         <h1 className="font-display text-3xl font-semibold tracking-tight text-text-primary">
           Chat
         </h1>
@@ -42,7 +42,7 @@ export default async function BotChatPage({
 
   if (botError) {
     return (
-      <div className="max-w-2xl">
+      <div className="mx-auto max-w-2xl">
         <h1 className="font-display text-3xl font-semibold tracking-tight text-text-primary">
           Chat
         </h1>
@@ -55,7 +55,7 @@ export default async function BotChatPage({
 
   if (!bot) {
     return (
-      <div className="max-w-2xl">
+      <div className="mx-auto max-w-2xl">
         <h1 className="font-display text-3xl font-semibold tracking-tight text-text-primary">
           Bot not found
         </h1>
@@ -90,7 +90,7 @@ export default async function BotChatPage({
 
   if (readyResult.error || conversationsResult.error) {
     return (
-      <div className="max-w-2xl">
+      <div className="mx-auto max-w-2xl">
         <h1 className="font-display text-3xl font-semibold tracking-tight text-text-primary">
           Chat
         </h1>
@@ -113,7 +113,7 @@ export default async function BotChatPage({
 
     if (messagesResult.error) {
       return (
-        <div className="max-w-2xl">
+        <div className="mx-auto max-w-2xl">
           <h1 className="font-display text-3xl font-semibold tracking-tight text-text-primary">
             Chat
           </h1>
@@ -133,7 +133,7 @@ export default async function BotChatPage({
   }
 
   return (
-    <div className="mx-auto w-full max-w-[720px]">
+    <div className="mx-auto flex min-h-0 w-full max-w-[720px] flex-1 flex-col overflow-hidden">
       <ChatThread
         botId={bot.id}
         botName={bot.name}
