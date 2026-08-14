@@ -12,7 +12,7 @@ resolved statuses always carry their resolution date
 
 ### Observation 3: Feature-review of a whole phase vs one feature
 
-**Status:** OPEN
+**Status:** ACTIONED (2026-08-14) — Applied to feature-review (weekly review). Remember chained-confirm skipped per user.
 **Date:** 2026-08-13
 **Session context:** User asked to restore session memory and then review a completed phase plus all prior progress
 **Skill:** feature-review
@@ -27,7 +27,7 @@ resolved statuses always carry their resolution date
 
 ### Observation 4: Review findings need runtime + current-docs check before cleanup work
 
-**Status:** OPEN
+**Status:** ACTIONED (2026-08-14) — Applied to feature-review (weekly review)
 **Date:** 2026-08-13
 **Session context:** User asked to fix review issues but first confirm against current docs; challenged a storage-orphan finding
 **Skill:** feature-review
@@ -43,7 +43,7 @@ resolved statuses always carry their resolution date
 
 ### Observation 5: Plan-specified verification vs TDD skill when the repo has no test runner
 
-**Status:** OPEN
+**Status:** ACTIONED (2026-08-14) — Applied to test-driven-development (weekly review)
 **Date:** 2026-08-13
 **Session context:** Implementing 09 in-app chat from an approved plan that named lint, build, and manual UI as verification
 **Skill:** test-driven-development
@@ -58,7 +58,7 @@ resolved statuses always carry their resolution date
 
 ### Observation 6: Drift control without a test suite is scope + typecheck, not TDD theater
 
-**Status:** OPEN
+**Status:** ACTIONED (2026-08-14) — Applied to test-driven-development, writing-plans, executing-plans (weekly review)
 **Date:** 2026-08-13
 **Session context:** User agreed to defer a test runner until after polished visible functionality, but worried AI would break unrelated code
 **Skill:** test-driven-development / writing-plans / executing-plans
@@ -73,7 +73,7 @@ resolved statuses always carry their resolution date
 
 ### Observation 7: Plan scope freeze vs a failing shared-lib typecheck at verify
 
-**Status:** OPEN
+**Status:** ACTIONED (2026-08-14) — Applied to writing-plans, executing-plans (weekly review)
 **Date:** 2026-08-13
 **Session context:** Implementing 10 embed snippet; plan forbade editing shared lib except listed files; `npm run build` failed in `lib/gemini.ts` on `thinkingLevel: "minimal"` vs SDK enum `ThinkingLevel.MINIMAL`
 **Skill:** writing-plans / executing-plans
@@ -88,7 +88,7 @@ resolved statuses always carry their resolution date
 
 ### Observation 8: supabase migration new timestamps can sort before existing files
 
-**Status:** OPEN
+**Status:** ACTIONED (2026-08-14) — Applied to writing-plans (weekly review). Plugin supabase skill not edited.
 **Date:** 2026-08-13
 **Session context:** Adding consume_owner_message_quota after get_bot_widget_config
 **Skill:** supabase / writing-plans
@@ -103,7 +103,7 @@ resolved statuses always carry their resolution date
 
 ### Observation 9: Service-role prerequisite cannot be filled by the agent without CLI login
 
-**Status:** OPEN
+**Status:** ACTIONED (2026-08-14) — Applied to writing-plans, executing-plans (weekly review)
 **Date:** 2026-08-13
 **Session context:** Implementing public widget chat that requires SUPABASE_SERVICE_ROLE_KEY
 **Skill:** executing-plans / supabase
@@ -133,7 +133,7 @@ resolved statuses always carry their resolution date
 
 ### Observation 11: Phase-complete reviews must grep leftover stub copy
 
-**Status:** OPEN
+**Status:** ACTIONED (2026-08-14) — Applied to feature-review (weekly review)
 **Date:** 2026-08-14
 **Session context:** Feature-review of phases 3–5 plus overall vs project-brief; widget chat was already shipped
 **Skill:** feature-review
@@ -148,7 +148,7 @@ resolved statuses always carry their resolution date
 
 ### Observation 12: Honor explicit triage — Important plus named Minors only
 
-**Status:** OPEN
+**Status:** ACTIONED (2026-08-14) — Applied to feature-review (weekly review)
 **Date:** 2026-08-14
 **Session context:** After a review-only session, the user asked to fix all Important items and one named Minor (favicon), and to skip other Minors if they do not matter for the demo
 **Skill:** feature-review
