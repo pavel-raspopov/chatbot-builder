@@ -24,6 +24,10 @@
 .DS_Store
 *.pem
 
+# local screen recordings (scripts stay in docs/demo/)
+docs/demo/*.mp4
+*.mp4
+
 # debug
 npm-debug.log*
 yarn-debug.log*

@@ -1,44 +1,49 @@
-# Memory — 13 Polish (review + viewport + centering)
+# Memory — 14 Presentation (Video 1 submitted)
 
-Last updated: 2026-08-14 (evening)
+Last updated: 2026-08-14 (late evening)
 
 ## What was built
 
-- Feature-review of phases 3–5 + overall vs `project-brief.md`; then Important fixes plus favicon
-- Widget preview copy: live replies (no “not connected yet”) — `app/w/[publicId]/page.tsx`
-- Chat persist: retrieve first, then quota, then persist user+assistant after a successful stream (`app/api/chat/route.ts`, `app/api/widget/chat/route.ts`)
-- In-app chat viewport: `AppShell` uses `h-dvh overflow-hidden` on `/bots/[id]/chat`, hides footer, navbar `shrink-0`; only the message list scrolls
-- Route `loading.tsx` / `error.tsx` / `not-found.tsx` via `RouteLoading`, `RouteError`, `RouteNotFound`
-- Favicon `app/icon.svg` (forest square, white D)
-- Operate columns `mx-auto max-w-2xl` (dashboard, bots, new, detail, billing) to match chat centering
+- Demo pack: `docs/demo/README.md`, `docs/demo/video-1-product-script.md`, `docs/demo/video-2-technical-script.md`, `docs/demo/northwind-desk-faq.md`
+- Root `README.md` for GitHub (product, stack, local setup — no Demo notes / HR open points)
+- Local `docuchat-product-demo.mp4` stays on disk, gitignored, not in git history
+- Item 14 Video 1 (product demo) recorded by Pavel and sent to HR with a short Russian note
+- Progress tracker / build-plan: 14 checked; Video 2 left as an open point
 
 ## Decisions made
 
-- No new features, no test runner, no seed demo bot
-- Skipped remaining Minors (clipboard alert, stripe listen hint, mobile Features/Pricing in landing nav, SSE `{ success }` envelope)
-- `/impeccable document` not needed — tokens/fonts/visual world unchanged; registry + ui-rules updated instead
-- Chat height contract is `h-dvh` on the shell, not `min-h-dvh` and not `calc(100dvh-…)` on the thread
+- Two videos: Video 1 is the brief deliverable; Video 2 only if they ask
+- Record Video 1 silent then voiceover (Clipchamp); Video 2 in OBS if needed
+- Windows Snipping Tool / Game Bar do not capture the front camera
+- Public README stays product-only; demo scripts can live in `docs/demo/` but not as GitHub landing copy
+- Do not commit mp4 recordings; rewrite history if one lands in a commit before push
+- No app feature work after Video 1 submit; waiting on HR
 
 ## Problems solved
 
-- First chat-scroll fix hid the footer but left `min-h-dvh`; page still grew. Root cause: `min-h-dvh` is a floor; nested `flex-1 min-h-0` needs a definite `h-dvh overflow-hidden` ancestor
-- `body` `overflow-x-hidden` computes `overflow-y: auto`, so an unbounded shell shows a second scrollbar
+- Built-in Windows capture is screen + mic only, not webcam (user meant screen recorder, not screensaver)
 
 ## Current state
 
-- Phase 6 item 13 complete. User verified chat (no page scroll), operate centering, main workflow
-- Item 14 Presentation is next (screenshare + voiceover)
-- Stripe/Gemini/Supabase keys stay in `.env.local` only
+- MVP complete (phases 1–6). Video 1 submitted. Waiting on the hiring result.
+- Video 2 not recorded. Script is ready.
+- Keys stay in `.env.local` only. Do not show them on camera.
 
 ## Next session starts with
 
-**14 Presentation** — record signup → upload → in-app chat → embed preview → Stripe test upgrade
+**Open point — Video 2**, only if HR asks for a technical follow-up:
+
+1. Open `docs/demo/video-2-technical-script.md`
+2. OBS: app + terminals, Supabase tables (no API keys), Gemini via chat UI, Stripe test Dashboard, brief + `lib/plans.ts`
+3. Hide webhook secrets and `.env.local`
+4. Export `docuchat-technical.mp4`
+
+If they do not ask: nothing to build. Do not add features unless they request changes.
 
 ## Open questions
 
-- None blocking 14
+- Whether HR wants Video 2 or a live demo
 
 ## Tests / TDD
 
 - No test runner. Verify with `npm run lint`, `npm run build`, and a manual click-through
-- Do not edit shared `lib/` (`rag`, `usage`, Gemini, Supabase clients) unless the feature plan lists them
