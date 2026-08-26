@@ -54,14 +54,14 @@ Shared fake Supabase (fluent, thenable query builder): tables keyed by op queues
 - `lib/billing.test.ts`: applySubscriptionToProfile patch shape (customer id only when present; subscriptionId nulled on free; branding reset on free); findUserIdByCustomerId
 - `lib/stripe.test.ts` (pure helpers, env stubs): isStripeConfigured, priceIdForPlan, planIdFromPriceId, planIdFromMetadata (strict raw match), readStripeId, priceIdFromSubscription
 
-### Task 6 — API routes
+### Task 6 — API routes (DONE)
 Mock boundary modules (`@/lib/supabase/server|admin`, `@/lib/rag/*`, `@/lib/usage`, `@/lib/chat/persist`) as needed.
 - `app/api/chat/route.test.ts`: invalid JSON 400; missing botId/message 400; oversize 400; unauthenticated 401; bot-not-found 404; retrieve failure 500; quota exhausted 429; SSE stream emits deltas + done(conversationId); empty retrieval → UNKNOWN_FROM_DOCS; persist called for both roles
 - `app/api/widget/chat/route.test.ts`: OPTIONS 204 + CORS headers; validation/auth-by-public-id; missing service role key 500; rate-limit 429; owner-plan drives limit; SSE success path
 - `app/api/ingest/route.test.ts`: JSON/validation 400; 401; delegates to ingestDocument and maps result status/chunkCount
 - `app/api/stripe/webhook/route.test.ts`: real signature verification via `stripe.webhooks.generateTestHeaderString` + fake secret; missing/invalid signature 400; checkout completed applies paid plan; non-subscription ignored; subscription.updated maps price→plan / unpaid → free downgrade; deleted → free; unknown events 200; apply-failure surfaces 500
 
-### Task 7 — Server actions
+### Task 7 — Server actions (DONE)
 Mock `next/navigation`, `next/cache`, `@/lib/supabase/server`.
 - `actions/auth.test.ts`: signIn validation/error passthrough/safe next path; signUp password <8, session vs confirm-email branches; signOut redirects "/"
 - `actions/bots.test.ts`: createBot name required, plan gating, insert + revalidate + redirect; updateBot save/not-found; deleteBot storage batch remove, count=0 not-found, success revalidates
