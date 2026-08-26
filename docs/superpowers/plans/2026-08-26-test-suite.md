@@ -43,7 +43,7 @@ Vitest config (node env default, globals on, coverage v8 scoped to lib/actions/a
 - Fixtures: `sample.txt`, `sample.md`, `sample.pdf` (generated with computed xref offsets so pdf.js parses it)
 - `lib/rag/extract.test.ts`: real PDF extraction; md/txt decode + CRLF/NUL normalization; unsupported MIME → ExtractError; empty file → ExtractError; corrupt bytes as application/pdf → ExtractError
 
-### Task 5 — RAG pipeline + usage + widget config + stripe helpers
+### Task 5 — RAG pipeline + usage + widget config + stripe helpers (DONE)
 Shared fake Supabase (fluent, thenable query builder): tables keyed by op queues (`select|insert|update|delete`), `rpc(name)` handlers, `storage.download/remove`, `auth.*`.
 - `lib/gemini.test.ts`: embedTexts batches of 20, count/length validation errors, empty input → [], formatEmbeddingForDb
 - `lib/rag/retrieve.test.ts`: rpc args include formatted embedding + bot id; error → throw; filters empty content + similarity < 0.25; null data → []
