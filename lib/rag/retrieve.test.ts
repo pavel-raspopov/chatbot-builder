@@ -67,13 +67,20 @@ describe("retrieveChunks", () => {
   });
 
   it("throws a friendly error when the RPC fails", async () => {
-    geminiMocks.embedTexts.mockResolvedValueOnce([EMBEDDING]);
-    const supabase = createFakeSupabase({
-      rpc: { match_chunks: { error: { message: "boom" } } },
-    });
-    await expect(retrieveChunks(supabase, "bot-1", "q")).rejects.toThrow(
-      "Could not search knowledge for this bot.",
-    );
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    try {
+      geminiMocks.embedTexts.mockResolvedValueOnce([EMBEDDING]);
+      const supabase = createFakeSupabase({
+        rpc: { match_chunks: { error: { message: "boom" } } },
+      });
+      await expect(retrieveChunks(supabase, "bot-1", "q")).rejects.toThrow(
+        "Could not search knowledge for this bot.",
+      );
+    } finally {
+      errorSpy.mockRestore();
+    }
   });
 
   it("throws when the query embedding is empty", async () => {

@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { ExtractError, extractDocumentText } from "@/lib/rag/extract";
 
 function fixture(name: string): Uint8Array {
@@ -71,10 +71,20 @@ describe("extractDocumentText", () => {
   });
 
   it("wraps corrupt PDFs in a friendly ExtractError", async () => {
-    await expectExtractError(
-      new TextEncoder().encode("this is not a pdf"),
-      "application/pdf",
-      "Could not read this PDF",
-    );
+    // extractDocumentText logs the underlying pdf.js error before wrapping it;
+    // silence it since this failure is expected.
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    try {
+      await expectExtractError(
+        new TextEncoder().encode("this is not a pdf"),
+        "application/pdf",
+        "Could not read this PDF",
+      );
+    } finally {
+      errorSpy.mockRestore();
+    }
   });
 });
