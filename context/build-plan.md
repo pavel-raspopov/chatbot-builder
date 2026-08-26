@@ -115,4 +115,4 @@ Record screenshare + voiceover: signup → upload → in-app chat → embed on s
 - [x] 11 Public widget API + script
 - [x] 12 Pricing gates + Stripe test Checkout
 - [x] 13 Polish
-- [x] 14 Presentation (Video 1 submitted; Video 2 open if HR asks — `docs/demo/video-2-technical-script.md`)
+- [x] 14 Presentation (product demo recorded)

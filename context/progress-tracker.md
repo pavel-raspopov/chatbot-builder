@@ -6,9 +6,9 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ## Current Status
 
-**Phase:** Phase 6 — done (waiting on HR)
-**Last completed:** 14 Presentation — product demo (Video 1) recorded and sent
-**Next / open point:** Video 2 technical walkthrough **only if they ask** — script is ready in `docs/demo/video-2-technical-script.md`
+**Phase:** Phase 6 — done
+**Last completed:** 14 Presentation — product demo recorded
+**Next / open point:** none — MVP complete
 
 ---
 
@@ -44,23 +44,14 @@ Update this file after every completed feature. Any AI agent reading this should
 ### Phase 6 — Polish + Demo
 
 - [x] 13 Polish
-- [x] 14 Presentation (Video 1 submitted; Video 2 is an open point — see Notes)
+- [x] 14 Presentation (product demo recorded)
 
 ---
 
-## Open point — Video 2 (if HR asks)
-
-Do not record unless they want a technical follow-up. Then:
-
-1. Read [`docs/demo/video-2-technical-script.md`](../docs/demo/video-2-technical-script.md) (B2 script, ~7 min)
-2. OBS scenes: localhost + terminals → Supabase Table Editor (no API keys) → chat UI (Gemini path) → Stripe Dashboard **Test mode** → `context/project-brief.md` + `lib/plans.ts`
-3. Hide `whsec_`, `sk_`, service role, `.env.local`
-4. Export 1080p `docuchat-technical.mp4`
-
 ## Notes
 
-- 2026-08-14 Phase 6 item 14: Video 1 product demo submitted to HR. Pack in `docs/demo/`. **Open point:** Video 2 technical (script ready, not recorded). Root `README.md` added for GitHub.
-- 2026-08-14 Phase 6 item 14 pack: scripts and FAQ in `docs/demo/` — README (tools, dry-run, no secrets), `video-1-product-script.md`, `video-2-technical-script.md`, `northwind-desk-faq.md`. Video 1 path: landing → signup → upload → Open chat → embed Preview → Billing Upgrade to Pro. Local Stripe still needs `stripe listen --forward-to localhost:3000/api/stripe/webhook`.
+- 2026-08-26 Repo made public on GitHub: internal agent tooling, session notes, and demo recording scripts moved out of version control; `context/project-brief.md` rewritten as a self-authored product brief.
+- 2026-08-14 Phase 6 item 14: product demo video recorded and submitted. Demo path: landing → signup → upload → Open chat → embed Preview → Billing Upgrade to Pro. Local Stripe needs `stripe listen --forward-to localhost:3000/api/stripe/webhook`.
 - 2026-08-14 Phase 6 item 13: Feature-review Important fixes — widget preview copy (live replies), retrieve-then-quota and persist user+assistant after a successful stream (`/api/chat` and `/api/widget/chat`), in-app chat fills remaining viewport (`AppShell` hides footer on chat), `loading.tsx` / `error.tsx` / `not-found.tsx`, `app/icon.svg`. Skipped seed demo bot and remaining Minor items (clipboard alert, stripe listen hint, mobile Features links). Next: 14 Presentation.
 
 - 2026-08-14 Phase 5: Stripe test Checkout + Portal via `actions/billing.ts`; webhook `POST /api/stripe/webhook`; `applySubscriptionToProfile` (service role). Branding checkbox on bot settings; `get_bot_widget_config` returns effective `remove_branding` (flag AND paid plan). Live Checkout needs `STRIPE_SECRET_KEY` + `STRIPE_PRICE_PRO` / `STRIPE_PRICE_BUSINESS` + `stripe listen` for `STRIPE_WEBHOOK_SECRET`. Decision: Server Actions for Checkout/Portal; Route Handler only for the webhook (not `app/api/stripe/checkout`).

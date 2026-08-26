@@ -2,7 +2,7 @@
 
 Embeddable chatbot builder for SaaS and product teams. Upload PDFs or Markdown, try a ChatGPT-like chat inside the app, then paste one script so the same answers appear on your website.
 
-This repo is a launchable **MVP** for a take-home product task: focused scope, real ingest + retrieval, a public widget, and Stripe **test-mode** billing. There are no live payments.
+This repo is a complete, launchable **MVP**: focused scope, real ingest + retrieval, a public widget, and Stripe **test-mode** billing. There are no live payments.
 
 ## What it does
 
@@ -97,4 +97,4 @@ context/        Product brief, architecture, build plan (source of truth while b
 
 ## License
 
-Private take-home MVP — not published as a product.
+Shared publicly as a portfolio piece. Code is provided as-is, without warranty — feel free to learn from it.

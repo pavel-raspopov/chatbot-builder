@@ -24,8 +24,7 @@
 .DS_Store
 *.pem
 
-# local screen recordings (scripts stay in docs/demo/)
-docs/demo/*.mp4
+# local screen recordings
 *.mp4
 
 # debug
@@ -68,3 +67,17 @@ next-env.d.ts
 .impeccable/live/deferred-svelte-component-accepts.json
 .impeccable/live/*.png
 # impeccable-ignore-end
+
+
+# local-only agent tooling, session memory, and private working notes
+/.agents/
+/.claude/
+/.cursor/
+/.impeccable/
+/AGENTS.md
+/CLAUDE.md
+/memory.md
+/skill-observations/
+/skill-updates/
+/skills-lock.json
+/docs/demo/

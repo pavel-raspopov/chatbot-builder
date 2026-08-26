@@ -1,29 +1,30 @@
-# Embeddable Chatbot Builder
+# DocuChat — Product Brief
 
-Build an MVP of a real product
+## Goal
 
-Build an app that allows users to upload their company docs and knowledge and turn it into a chatbot. Chatbot is available inside the app as a chatgpt-like chat interface and also as an embeddable widget, so customers can embed this widget to their websites (so their users can ask questions).
+Build a real product MVP: an app where users upload their company documents and knowledge and turn them into a chatbot. The bot works inside the app as a ChatGPT-like chat, and the same bot can be embedded on any website as a widget, so visitors can ask questions there too.
 
-Implement pricing for the app and billing flow (use stripe test account and credentials or just mock billing). Come up with pricing and gated features, whatever makes sense.
+Treat the result as a product ready to launch and serve real users — even though billing runs in Stripe test mode with no live payments.
 
-Treat the demo app as a real product MVP ready to launch and served to real users, even though there is no live payments on it.
+## Scope
 
-Add anything else on top of these requirements (like specific niche you like or features that make the product useful), but keep the app meaningful and usable.
+Focused scope only — every feature has to earn its place:
 
-Suggested Stack:
+- Landing page showcasing the product features and pricing
+- Upload company docs (PDF, Markdown, or plain text) and turn them into a searchable knowledge base
+- In-app chat grounded in those documents; when the answer is not in the docs, say so instead of inventing one
+- Embeddable widget so customers can put the same bot on their website
+- Pricing with gated plans and a working Stripe test billing flow
 
-- Supabase for storing data, user auth and vector search;
-- Any AI API for serving chatbot (ChatGPT/Gemini or other);
+## Stack
 
-Deliverables:
+- Supabase — data storage, user auth, vector search
+- Google Gemini — embeddings and chat answers
+- Stripe test mode — pricing and billing
 
-- Landing page showcasing the product features and pricing;
-- Web app implementing the features above;
-- Presentation: rather video demo with screenshare and voiceover (preferred) or a written tutorial with screenshots;
+## What good looks like
 
-Criteria on the demo project check:
-
-- No useless features, focused scope;
-- Descriptive landing page, showcasing product just enough so users want to test it out;
-- Functioning app and working features;
-- Attention to detail (copywriting, design, feel, functionality);
+- No useless features; focused scope
+- A descriptive landing page that shows the product just enough so users want to test it
+- A functioning app with working features
+- Attention to detail: copywriting, design, feel, functionality
