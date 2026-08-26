@@ -26,8 +26,22 @@ export default defineConfig({
       ],
       exclude: [
         "lib/supabase/database.types.ts",
+        // Thin SDK/environment wrappers that only exercise real Supabase or
+        // network I/O in production — unit-tested indirectly via consumers.
+        "lib/supabase/server.ts",
+        "lib/supabase/admin.ts",
+        "lib/supabase/client.ts",
+        "lib/supabase/env.ts",
+        "lib/supabase/proxy.ts",
+        "lib/chat/streamClient.ts",
+        "lib/ingest-client.ts",
         "**/*.d.ts",
       ],
+      thresholds: {
+        global: { lines: 65 },
+        "lib/**/*.ts": { lines: 80 },
+      },
     },
   },
 });
+

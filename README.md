@@ -82,7 +82,22 @@ npm run lint
 npm run build
 ```
 
-There is no test runner in this MVP. Verify with lint, build, and a manual click-through.
+## Testing
+
+The suite runs on [Vitest](https://vitest.dev) with Testing Library (happy-dom) for components:
+
+```
+npm run test            # single pass
+npm run test:watch      # watch mode
+npm run test:coverage   # coverage report + thresholds
+```
+
+- **lib/** — pure utilities, RAG pipeline, usage quotas, billing/stripe helpers (fake Supabase client in `tests/helpers/fake-supabase.ts`)
+- **app/api/** — route handlers incl. SSE streaming and real Stripe signature verification
+- **actions/** — server actions with mocked `next/navigation` redirects
+- **components/** — interactive UI (forms, uploader, composer)
+
+Coverage thresholds: global lines ≥ 65%, `lib/` lines ≥ 80%.
 
 ## Project layout
 

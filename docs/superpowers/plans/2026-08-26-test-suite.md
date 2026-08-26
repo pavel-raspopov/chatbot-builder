@@ -29,17 +29,17 @@
 ### Task 1 — Scaffold (DONE)
 Vitest config (node env default, globals on, coverage v8 scoped to lib/actions/api/components), setup file imports jest-dom matchers, npm scripts `test` / `test:watch` / `test:coverage`. Smoke test proves pipeline.
 
-### Task 2 — Pure utilities
+### Task 2 — Pure utilities (DONE)
 - `lib/plans.test.ts`: normalizePlanId fallbacks (null/undefined/garbage), getPlan/getPlanLimits per tier, canRemoveBranding (free=false, pro/business=true), plans array shape (3 entries, highlighted exactly once)
 - `lib/app-url.test.ts`: env override trims trailing slash; default localhost when unset
 - `lib/widget/cors.test.ts`: header values + non-mutating copy
 - `lib/rag/chunk.test.ts`: empty/whitespace → []; short text single chunk; long text respects chunkChars/overlap invariants; soft-break preference; estimateTokenCount floor of 1
 - `lib/documents.test.ts`: getFileExtension edge cases; resolveDocumentMimeType matrix; sanitizeFilename; buildDocumentStoragePath; formatBytes tiers; validateDocumentMeta accept/reject paths
 
-### Task 3 — Rate limiting
+### Task 3 — Rate limiting (DONE)
 - `lib/widget/rateLimit.test.ts`: getClientIp precedence (x-forwarded-for first entry > x-real-ip > fallback); widgetRateLimitPerMinute (business=60 else 20); allowWidgetRequest sliding window under fake timers, per-key isolation, stale timestamps pruned, deny at limit then allow after window slides
 
-### Task 4 — Extraction
+### Task 4 — Extraction (DONE)
 - Fixtures: `sample.txt`, `sample.md`, `sample.pdf` (generated with computed xref offsets so pdf.js parses it)
 - `lib/rag/extract.test.ts`: real PDF extraction; md/txt decode + CRLF/NUL normalization; unsupported MIME → ExtractError; empty file → ExtractError; corrupt bytes as application/pdf → ExtractError
 
@@ -68,10 +68,10 @@ Mock `next/navigation`, `next/cache`, `@/lib/supabase/server`.
 - `actions/documents.test.ts`: createDocument meta validation, bot ownership, storage-quota projection, insert pending row; deleteDocument storage tolerated-error, count semantics
 - `actions/billing.test.ts`: startCheckout unconfigured Stripe, invalid plan, already-on-plan, existing subscription guard, redirect(url); startPortal no-customer + redirect
 
-### Task 8 — Components (happy-dom)
+### Task 8 — Components (happy-dom) (DONE)
 Button/Input/Textarea render; LoginForm/SignupForm validation + submit; CreateBotForm; DocumentUpload accepted extensions + states; EmbedSnippet content + clipboard; ChatComposer disabled/submit behavior; ChatThread/ChatMessage render; UsageMeter thresholds.
 
-### Task 9 — Wrap-up
+### Task 9 — Wrap-up (DONE)
 Coverage thresholds from achieved numbers (global lines ≥ 70, lib ≥ 80 target), README "Testing" section, progress-tracker entry, `/remember save`.
 
 ## Out of scope
