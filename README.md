@@ -97,4 +97,4 @@ context/        Product brief, architecture, build plan (source of truth while b
 
 ## License
 
-Shared publicly as a portfolio piece. Code is provided as-is, without warranty — feel free to learn from it.
+Released under the [MIT License](LICENSE) — shared as a portfolio piece, feel free to learn from it.
