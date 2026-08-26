@@ -133,12 +133,13 @@ describe("POST /api/widget/chat validation", () => {
       400,
       /message is required/i,
     ],
-  ])("rejects %s with 400", (_name, body, expectedStatus) => {
+  ])("rejects %s with 400", (_name, _body, expectedStatus, _pattern) => {
     void _name;
+    void _pattern;
     const request =
-      typeof body === "string"
-        ? rawRequest(body, "10.9.0.1")
-        : postRequest(body, "10.9.0.1");
+      typeof _body === "string"
+        ? rawRequest(_body, "10.9.0.1")
+        : postRequest(_body, "10.9.0.1");
     return expect(POST(request)).resolves.toMatchObject({
       status: expectedStatus,
     });

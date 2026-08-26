@@ -153,7 +153,9 @@ export function createFakeSupabase(
     },
   };
 
-  return client as SupabaseClient<Database> & { calls: FakeSupabaseCalls };
+  return client as unknown as SupabaseClient<Database> & {
+    calls: FakeSupabaseCalls;
+  };
 }
 
 

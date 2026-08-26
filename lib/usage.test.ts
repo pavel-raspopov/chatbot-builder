@@ -48,7 +48,11 @@ describe("consumeMessageQuota", () => {
 
     const result = await consumeMessageQuota(supabase, "ghost");
 
-    expect(result.statusCode).toBe(500);
+    if (!result.ok) {
+      expect(result.statusCode).toBe(500);
+    } else {
+      expect.unreachable("quota should fail when the profile row is missing");
+    }
   });
 
   it("detects a missing RPC and asks for migrations", async () => {
@@ -66,7 +70,7 @@ describe("consumeMessageQuota", () => {
 
     expect(result).toEqual({
       ok: false,
-      error: expect.stringMatching(/not configured.*migration/is),
+      error: expect.stringMatching(/not configured[\s\S]*migration/i),
       statusCode: 500,
     });
   });
@@ -102,7 +106,7 @@ describe("consumeMessageQuota", () => {
 
     expect(result).toEqual({
       ok: false,
-      error: expect.stringMatching(/monthly message limit.*upgrade/is),
+      error: expect.stringMatching(/monthly message limit[\s\S]*upgrade/i),
       statusCode: 429,
     });
   });
