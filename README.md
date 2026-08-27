@@ -1,32 +1,187 @@
 # DocuChat
 
-Embeddable chatbot builder for SaaS and product teams. Upload PDFs or Markdown, try a ChatGPT-like chat inside the app, then paste one script so the same answers appear on your website.
+**Clean, embeddable RAG chatbot widget SaaS powered by Next.js, Supabase (pgvector), and TypeScript.**
 
-This repo is a complete, launchable **MVP**: focused scope, real ingest + retrieval, a public widget, and Stripe **test-mode** billing. There are no live payments.
+Upload your product docs, chat with them inside the app, then embed one script on your website so visitors get the same grounded answers. This repository is a complete, launchable **MVP** — real ingest, real retrieval, a public widget, and Stripe **test-mode** billing. There are no live payments anywhere in the codebase.
 
-## What it does
+## Badges
 
-- **Landing** — product story, features, Free / Pro / Business pricing
-- **Auth** — email and password (Supabase Auth)
-- **Bots** — create a bot, set welcome message and system prompt
-- **Knowledge** — upload `.pdf`, `.md`, or `.txt`; files are chunked and embedded
-- **In-app chat** — answers from that bot’s docs; says it does not know when retrieval is empty
-- **Embed widget** — copy-paste snippet + hosted preview; Free plan shows a DocuChat badge
-- **Billing** — Stripe Checkout and Customer Portal in test mode; server-side gates for bots, messages, storage, and branding
+![Next.js](https://img.shields.io/badge/Next.js%2016-000000?logo=nextdotjs&logoColor=white&style=flat-square)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white&style=flat-square)
+![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?logo=supabase&logoColor=white&style=flat-square)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS%20v4-38BDF8?logo=tailwindcss&logoColor=white&style=flat-square)
+![MIT License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
-In-app chat and the widget share the same retrieval and answer path.
+## Demo
 
-## Stack
+![Chatbot Builder Demo](./assets/demo.gif)
 
-| Layer | Tool |
+The capture walks the full product: the dashboard, a grounded chat conversation, the same bot embedded as a widget on a sample site, the billing page, and subscription management through the Stripe Customer Portal (test mode).
+
+## Key features
+
+- **Embeddable widget** — a single `<script>` tag with a `data-bot` attribute injects a floating launcher and an iframe chat panel (`public/widget.js`, vanilla JS — no framework required on your site).
+- **RAG over your docs** — query embeddings are searched against Supabase **pgvector** (768-dim) via a `match_chunks` RPC; only the top relevant chunks are sent to the LLM.
+- **Fast streaming answers** — chat responses stream as Server-Sent Events (`text/event-stream`) from Gemini; the in-app chat and the widget share the exact same pipeline.
+- **Grounded, honest replies** — the model answers only from retrieved chunks and explicitly says it does not know when retrieval returns nothing.
+- **Upload and index** — `.pdf`, `.md`, and `.txt` files are extracted, chunked, embedded, and stored in Supabase Storage + Postgres.
+- **Customizable per bot** — welcome message, system prompt, name, and widget branding (removable on paid plans).
+- **Server-side plan gates** — bot count, monthly messages, and storage are enforced in `lib/plans.ts` and usage quotas. The client can never write `profiles.plan`.
+- **Stripe test-mode billing** — Checkout and the Customer Portal with webhook fulfillment into `subscriptions` / `profiles.plan`.
+
+## Tech stack & architecture
+
+| Layer | Technology |
 | --- | --- |
-| App | Next.js 16 (App Router), React 19, TypeScript |
-| Auth, DB, Storage, vectors | Supabase (Postgres, RLS, pgvector, Storage) |
-| AI | Google Gemini (embeddings + chat) |
-| Billing | Stripe test mode (Checkout + webhooks) |
-| UI | Tailwind CSS v4, design tokens |
+| Frontend | Next.js 16 (App Router), React 19, TypeScript (strict), Tailwind CSS v4 + design tokens |
+| Backend | Next.js API Routes + Server Actions; anon-key client under RLS, server-only service-role client for ingest |
+| Database | Supabase Postgres with row-level security, **pgvector** (768-dim), Storage, Auth |
+| AI / LLM | Google Gemini — embeddings (`gemini-embedding-001`) + streaming chat (`gemini-3.6-flash`) |
+| Billing | Stripe test mode — Checkout, Customer Portal, webhooks |
+| Tests | Vitest 4 + Testing Library (297 tests) |
 
-Not used: OpenAI, live Stripe charges, team seats.
+### RAG flow
+
+In-app chat and the embeddable widget run through the same path; they differ only in auth, CORS, and rate limiting:
+
+```
+┌──────────────────────────────┐   1. user question
+│  Customer site widget        │ ─────────────────────────────▶
+│  or in-app chat              │
+└──────────────┬───────────────┘
+               │
+               ▼
+┌──────────────────────────────┐
+│  Next.js API Route           │
+│  /api/chat (signed in) or    │
+│  /api/widget/chat (public)   │
+└──────────────┬───────────────┘
+               │ 2. embed the question
+               ▼
+┌──────────────────────────────┐
+│  Gemini embeddings           │
+│  gemini-embedding-001        │
+└──────────────┬───────────────┘
+               │ 3. top-k similarity search
+               ▼
+┌──────────────────────────────┐
+│  Supabase pgvector           │
+│  match_chunks RPC (top 8)    │
+└──────────────┬───────────────┘
+               │ 4. chunks + system prompt
+               ▼
+┌──────────────────────────────┐
+│  Gemini streaming            │
+│  gemini-3.6-flash            │
+└──────────────┬───────────────┘
+               │ 5. SSE deltas (text/event-stream)
+               ▼
+               Client
+```
+
+Document ingest follows the same pipeline in reverse: upload → Storage → extract text (`unpdf`) → chunk → embed (retrieval document) → insert into `chunks`.
+
+## Getting started
+
+### Prerequisites
+
+- **Node.js 20+** and npm
+- A **Supabase** project (free tier is fine)
+- A **Google AI Studio** API key for Gemini
+- **Stripe** test keys + the Stripe CLI — only needed for billing flows; the rest of the app works without them
+
+### Local setup
+
+1. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Copy the environment template and fill it in:
+
+   ```bash
+   cp .env.example .env.local
+   ```
+
+   Required keys:
+
+   | Variable | Notes |
+   | --- | --- |
+   | `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL |
+   | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Prefer the publishable key; anon JWT still accepted as fallback |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Legacy anon key (fallback) |
+   | `SUPABASE_SERVICE_ROLE_KEY` | **Server-only** — never expose it to the browser |
+   | `GEMINI_API_KEY` | Google AI Studio key for embeddings + chat |
+   | `NEXT_PUBLIC_APP_URL` | Public origin for the embed snippet src, no trailing slash (usually `http://localhost:3000`) |
+   | `STRIPE_SECRET_KEY` | Stripe **test** secret key |
+   | `STRIPE_WEBHOOK_SECRET` | Signing secret printed by `stripe listen` (see below) |
+   | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe test publishable key |
+   | `STRIPE_PRICE_PRO` / `STRIPE_PRICE_BUSINESS` | Test-mode price IDs for the Pro and Business plans |
+
+   Never commit `.env.local`.
+
+3. Apply the SQL in [`supabase/migrations/`](supabase/migrations/) to your Supabase project. The schema creates `profiles`, `bots`, `documents`, `chunks` (vector 768), conversations/messages, RLS policies, quota RPCs, and the `match_chunks` search function; the first migration enables the `vector` extension.
+
+4. Create a **private** Storage bucket named `documents` (files are served through the server, never from a public bucket URL).
+
+5. In **Supabase Auth → Providers → Email**, turn **Confirm email** off for a smooth local demo (signup returns a session immediately).
+
+6. Run the app:
+
+   ```bash
+   npm run dev
+   ```
+
+   Then open [http://localhost:3000](http://localhost:3000).
+
+7. For billing to update after Checkout, forward webhooks in a second terminal:
+
+   ```bash
+   stripe listen --forward-to localhost:3000/api/stripe/webhook
+   ```
+
+   Copy the `whsec_...` signing secret printed by the CLI into `STRIPE_WEBHOOK_SECRET` and restart the dev server. Use Stripe's test card. Without `stripe listen`, Checkout can succeed but the plan stays Free.
+
+Optional verification:
+
+```bash
+npm run lint
+npm run build
+```
+
+## How to embed the widget
+
+No React or build step required on your site — paste this just before the closing `</body>`:
+
+```html
+<script
+  src="https://your-deployment.example.com/widget.js"
+  data-bot="YOUR_BOT_PUBLIC_ID"
+  async
+></script>
+```
+
+- `data-bot` is the bot's `public_id`, shown on the bot's **Embed** page in the app.
+- `widget.js` reads the `data-bot` attribute, then injects a floating launcher button and an iframe pointing to `/w/{publicId}/embed` on your deployment origin. Chat runs inside that iframe against `/api/widget/chat` (CORS-enabled and rate-limited per visitor IP). Because the script resolves its origin from `script.src`, the same snippet works in localhost and in production.
+
+In a React / Next.js app, the same launcher mounts with `next/script`:
+
+```tsx
+import Script from "next/script";
+
+export function SupportWidget({ publicId }: { publicId: string }) {
+  return (
+    <Script
+      src="https://your-deployment.example.com/widget.js"
+      strategy="afterInteractive"
+      data-bot={publicId}
+    />
+  );
+}
+```
+
+The Free plan shows a "Powered by DocuChat" badge in the widget; Pro and Business can hide it.
 
 ## Plans
 
@@ -38,49 +193,7 @@ Not used: OpenAI, live Stripe charges, team seats.
 | Doc storage | 10 MB | 200 MB | 1 GB |
 | Widget badge | Shown | Can hide | Can hide |
 
-Limits are enforced on the server (`lib/plans.ts`). The client cannot write `profiles.plan`.
-
-## Local setup
-
-1. Clone the repo and install:
-
-   ```bash
-   npm install
-   ```
-
-2. Copy [`.env.example`](.env.example) to `.env.local` and fill in:
-
-   - Supabase URL, publishable (or anon) key, and **server-only** service role key
-   - `GEMINI_API_KEY`
-   - Stripe **test** secret key, webhook secret, and price IDs for Pro and Business
-   - `NEXT_PUBLIC_APP_URL` (usually `http://localhost:3000`)
-
-   Never commit `.env.local`.
-
-3. Apply SQL in [`supabase/migrations/`](supabase/migrations/) to your Supabase project. Enable the `vector` extension. Create a private Storage bucket named `documents`.
-
-4. In Supabase Auth → Providers → Email, turn **Confirm email** off for a smooth local demo (signup returns a session immediately).
-
-5. Run the app:
-
-   ```bash
-   npm run dev
-   ```
-
-   Open [http://localhost:3000](http://localhost:3000).
-
-6. For billing to update after Checkout, forward webhooks in a second terminal:
-
-   ```bash
-   stripe listen --forward-to localhost:3000/api/stripe/webhook
-   ```
-
-   Use Stripe test card `ACCT-000015`. Without `stripe listen`, Checkout can succeed and the plan stays Free.
-
-```bash
-npm run lint
-npm run build
-```
+Limits are enforced on the server (`lib/plans.ts` + usage quotas); the client cannot change `profiles.plan`.
 
 ## Testing
 
@@ -92,23 +205,31 @@ npm run test:watch      # watch mode
 npm run test:coverage   # coverage report + thresholds
 ```
 
-- **lib/** — pure utilities, RAG pipeline, usage quotas, billing/stripe helpers (fake Supabase client in `tests/helpers/fake-supabase.ts`)
-- **app/api/** — route handlers incl. SSE streaming and real Stripe signature verification
+- **lib/** — RAG pipeline, usage quotas, billing/stripe helpers, pure utilities (fake Supabase client in `tests/helpers/fake-supabase.ts`)
+- **app/api/** — route handlers including SSE streaming and real Stripe signature verification
 - **actions/** — server actions with mocked `next/navigation` redirects
-- **components/** — interactive UI (forms, uploader, composer)
+- **components/** — interactive UI (forms, uploader, composer, widget panel)
 
 Coverage thresholds: global lines ≥ 65%, `lib/` lines ≥ 80%.
 
 ## Project layout
 
 ```
-app/            Routes (landing, auth, dashboard, bots, chat, billing, public widget)
-actions/        Server Actions (auth, bots, documents, billing)
-lib/            Supabase clients, Gemini, RAG, plans, usage
-public/widget.js  Embed launcher for customer sites
-supabase/migrations/  Schema, RLS, RPCs
-context/        Product brief, architecture, build plan (source of truth while building)
+app/                 Routes (landing, auth, dashboard, bots, chat, billing, public widget)
+actions/             Server Actions (auth, bots, documents, billing)
+components/          React components (forms, chat UI, widget panel, embed snippet)
+lib/                 Supabase clients, Gemini, RAG, plans, usage, Stripe
+public/widget.js     Embed launcher for customer sites (vanilla JS)
+supabase/migrations/ Schema, RLS, RPCs
+tests/               Shared test helpers
+assets/              README media (demo.gif)
 ```
+
+## Scope
+
+- **Gemini only** — embeddings and chat use Google Gemini; OpenAI/OpenRouter are not used.
+- **Stripe test mode only** — no live charges, no production webhooks.
+- No team seats / SSO; single-owner workspaces.
 
 ## License
 
