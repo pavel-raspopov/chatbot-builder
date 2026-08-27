@@ -45,36 +45,36 @@ The capture walks the full product: the dashboard, a grounded chat conversation,
 In-app chat and the embeddable widget run through the same path; they differ only in auth, CORS, and rate limiting:
 
 ```
-┌──────────────────────────────┐   1. user question
-│  Customer site widget        │ ─────────────────────────────▶
+┌──────────────────────────────┐
+│  Customer site widget        │
 │  or in-app chat              │
 └──────────────┬───────────────┘
-               │
+               │  1. user question
                ▼
 ┌──────────────────────────────┐
 │  Next.js API Route           │
 │  /api/chat (signed in) or    │
 │  /api/widget/chat (public)   │
 └──────────────┬───────────────┘
-               │ 2. embed the question
+               │  2. embed the question
                ▼
 ┌──────────────────────────────┐
 │  Gemini embeddings           │
 │  gemini-embedding-001        │
 └──────────────┬───────────────┘
-               │ 3. top-k similarity search
+               │  3. top-k similarity search
                ▼
 ┌──────────────────────────────┐
 │  Supabase pgvector           │
 │  match_chunks RPC (top 8)    │
 └──────────────┬───────────────┘
-               │ 4. chunks + system prompt
+               │  4. chunks + system prompt
                ▼
 ┌──────────────────────────────┐
 │  Gemini streaming            │
 │  gemini-3.6-flash            │
 └──────────────┬───────────────┘
-               │ 5. SSE deltas (text/event-stream)
+               │  5. SSE deltas (text/event-stream)
                ▼
                Client
 ```
